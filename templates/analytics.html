@@ -1,0 +1,1162 @@
+{% extends "layout.html" %}
+
+{% block title %}Analytics | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Verify Chart.js loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js failed to load!');
+    } else {
+        console.log('Chart.js loaded successfully');
+    }
+</script>
+
+<style>
+    .analytics-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        color: white;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(29, 78, 216, 0.3);
+    }
+    
+    .analytics-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+    }
+    
+    .analytics-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 968px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .chart-container {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .chart-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+    }
+    
+    .chart-container.full-width {
+        width: 100%;
+        margin-bottom: 2rem;
+        clear: both;
+    }
+    
+    .charts-grid .chart-container {
+        margin-bottom: 0;
+    }
+    
+    .charts-grid + .chart-container.full-width {
+        margin-top: 0;
+    }
+    
+    .chart-container.full-width .chart-wrapper:last-of-type {
+        margin-bottom: 0;
+    }
+    
+    .chart-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border);
+    }
+    
+    .chart-header i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+    
+    .chart-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--text);
+    }
+    
+    .chart-explanation {
+        background: var(--surface-alt);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+        border-left: 4px solid var(--primary);
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.6;
+    }
+    
+    .chart-explanation strong {
+        color: var(--text);
+    }
+    
+    .chart-wrapper {
+        position: relative;
+        height: 350px;
+        margin: 1rem 0;
+        min-height: 350px;
+    }
+    
+    .gauge-wrapper {
+        position: relative;
+        height: 300px;
+        margin: 1rem 0;
+        min-height: 300px;
+    }
+    
+    #hourlyChartContainer {
+        margin-top: 2rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2);
+    }
+    
+    .stat-card.success {
+        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    }
+    
+    .stat-card.danger {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+    }
+    
+    .stat-card.warning {
+        background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+    }
+    
+    .stat-card h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+    
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .heatmap-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0;
+    }
+    
+    .heatmap-cell {
+        background: var(--surface-alt);
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    
+    .heatmap-cell:hover {
+        transform: scale(1.05);
+        border-color: var(--primary);
+    }
+    
+    .heatmap-cell.low { background: #d1fae5; border-color: #10b981; }
+    .heatmap-cell.medium { background: #fef3c7; border-color: #f59e0b; }
+    .heatmap-cell.high { background: #fee2e2; border-color: #ef4444; }
+    
+    [data-theme="dark"] .heatmap-cell.low { background: #064e3b; border-color: #10b981; }
+    [data-theme="dark"] .heatmap-cell.medium { background: #78350f; border-color: #f59e0b; }
+    [data-theme="dark"] .heatmap-cell.high { background: #7f1d1d; border-color: #ef4444; }
+    
+    .timeline-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: var(--surface-alt);
+        border-radius: 8px;
+        border-left: 4px solid var(--danger);
+    }
+    
+    .timeline-item .risk-score {
+        font-weight: 700;
+        color: var(--danger);
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="analytics-header">
+    <h1><i class="fas fa-chart-line"></i> Comprehensive Analytics Dashboard</h1>
+    <p>Deep insights into fraud patterns, claim trends, and risk factors</p>
+</div>
+
+{% if total_claims == 0 %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <i class="fas fa-chart-bar" style="font-size: 4rem; color: var(--muted); margin-bottom: 1rem;"></i>
+    <h3 style="color: var(--muted);">No Data Available</h3>
+    <p style="color: var(--muted);">Start submitting claims to see analytics and insights.</p>
+    <a href="{{ url_for('upload_claim') }}" class="btn btn-primary" style="margin-top: 1rem;">Submit Your First Claim</a>
+</div>
+{% else %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h4><i class="fas fa-file-invoice"></i> Total Claims</h4>
+        <p class="value">{{ total_claims }}</p>
+    </div>
+    <div class="stat-card success">
+        <h4><i class="fas fa-check-circle"></i> Legitimate Claims</h4>
+        <p class="value">{{ legitimate_count }}</p>
+    </div>
+    <div class="stat-card danger">
+        <h4><i class="fas fa-exclamation-triangle"></i> Fraud Detected</h4>
+        <p class="value">{{ fraud_count }}</p>
+    </div>
+    <div class="stat-card warning">
+        <h4><i class="fas fa-percentage"></i> Fraud Rate</h4>
+        <p class="value">{{ "%.1f"|format((fraud_count / total_claims * 100) if total_claims > 0 else 0) }}%</p>
+    </div>
+</div>
+
+<!-- Charts Grid - 2 per row -->
+<div class="charts-grid">
+    <!-- 1. Fraud Risk Distribution - Donut Chart -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-chart-pie"></i>
+            <h3>Fraud Risk Distribution</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>📊 What this shows:</strong> This donut chart displays how claims are distributed across different risk levels. The center shows the total number of claims. Understanding risk distribution helps identify patterns and allocate resources effectively.
+        </div>
+    </div>
+
+    <!-- 2. Fraud Detection Gauge -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Fraud Detection Performance</h3>
+        </div>
+        <div class="gauge-wrapper">
+            <canvas id="gaugeChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>⚡ What this shows:</strong> This speedometer-style gauge shows your system's fraud detection rate. The needle points to the percentage of claims flagged as fraudulent. Green indicates healthy detection rates, while red suggests high fraud activity.
+        </div>
+    </div>
+
+    <!-- 3. Claim Type Breakdown - Pie Chart -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-chart-pie"></i>
+            <h3>Claims by Type</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="claimTypeChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>🎯 What this shows:</strong> This pie chart breaks down all claims by their type (Auto, Health, Property, etc.). Each slice shows both the total count and fraud percentage for that category. Larger slices indicate more common claim types.
+        </div>
+    </div>
+
+    <!-- 4. Age Group Analysis - Bar Chart -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-users"></i>
+            <h3>Fraud Risk by Age Group</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="ageChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>👥 What this shows:</strong> This grouped bar chart compares total claims and fraud cases across different age groups. It helps identify which age demographics are most vulnerable to fraud or file the most claims.
+        </div>
+    </div>
+
+    <!-- 5. Claim Amount Distribution - Bar Chart -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-dollar-sign"></i>
+            <h3>Claim Amount Distribution</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="amountChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>💰 What this shows:</strong> This bar chart shows how claims are distributed across different amount ranges. The gradient colors indicate fraud rates - darker colors mean higher fraud percentages. Large claims often require extra scrutiny.
+        </div>
+    </div>
+
+    <!-- 6. Gender Analysis - Grouped Bar Chart -->
+    <div class="chart-container">
+        <div class="chart-header">
+            <i class="fas fa-venus-mars"></i>
+            <h3>Claims Analysis by Gender</h3>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="genderChart"></canvas>
+        </div>
+        <div class="chart-explanation">
+            <strong>⚖️ What this shows:</strong> This chart compares claim patterns across genders, showing total claims, fraud cases, average risk scores, and claim amounts. This helps identify any demographic patterns in fraud behavior.
+        </div>
+    </div>
+</div>
+
+<!-- Full-width charts -->
+<!-- 7. Fraud Risk Scatter Plot - Claim Amount vs Risk Score -->
+<div class="chart-container full-width">
+    <div class="chart-header">
+        <i class="fas fa-chart-scatter"></i>
+        <h3>Fraud Risk Scatter Analysis</h3>
+    </div>
+    <div class="chart-wrapper">
+        <canvas id="scatterChart"></canvas>
+    </div>
+    <div class="chart-explanation">
+        <strong>🎯 What this shows:</strong> This scatter plot reveals the relationship between claim amounts and fraud risk scores. Each point represents a claim - red points indicate detected fraud, blue points are legitimate. Clusters in the upper-right corner (high amount + high risk) are particularly suspicious and require immediate investigation.
+    </div>
+</div>
+
+<!-- 8. Risk Factors Correlation Heatmap -->
+<div class="chart-container full-width">
+    <div class="chart-header">
+        <i class="fas fa-project-diagram"></i>
+        <h3>Risk Factors Correlation Matrix</h3>
+    </div>
+    <div class="chart-wrapper">
+        <canvas id="correlationChart"></canvas>
+    </div>
+    <div class="chart-explanation">
+        <strong>🔗 What this shows:</strong> This radar chart compares risk factors across different claim types. Each colored shape represents a claim type, showing how it scores across six key dimensions. Larger shapes indicate higher risk factors. This visualization helps identify which claim types have the most concerning risk profiles and which factors contribute most to fraud detection.
+    </div>
+</div>
+
+<!-- 9. Temporal Fraud Pattern - Day/Hour Heatmap -->
+<div class="chart-container full-width">
+    <div class="chart-header">
+        <i class="fas fa-clock"></i>
+        <h3>Fraud Activity Patterns by Time</h3>
+    </div>
+    <div class="chart-wrapper">
+        <canvas id="temporalChart"></canvas>
+    </div>
+    <div class="chart-wrapper" id="hourlyChartContainer" style="margin-top: 2rem;">
+        <canvas id="hourlyChart"></canvas>
+    </div>
+    <div class="chart-explanation">
+        <strong>⏰ What this shows:</strong> This dual visualization reveals when fraud attempts are most likely to occur. The top chart shows fraud patterns by day of week, while the bottom shows hourly patterns. Fraudsters often have specific timing patterns - identifying these helps allocate monitoring resources effectively.
+    </div>
+</div>
+
+<!-- 10. Policy Age vs Fraud Risk - Heatmap -->
+<div class="chart-container full-width">
+    <div class="chart-header">
+        <i class="fas fa-calendar-alt"></i>
+        <h3>Policy Age Impact on Fraud Risk</h3>
+    </div>
+    <div class="heatmap-container">
+        {% for item in policy_age_analysis %}
+        <div class="heatmap-cell {% if item.avg_risk_score > 0.7 %}high{% elif item.avg_risk_score > 0.4 %}medium{% else %}low{% endif %}">
+            <div style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.policy_age_group }}</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text);">{{ "%.0f"|format(item.avg_risk_score * 100) }}%</div>
+            <div style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">{{ item.total_claims }} claims</div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">{{ item.fraud_count }} fraud</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-explanation">
+        <strong>🔥 What this shows:</strong> This heatmap visualizes how policy age affects fraud risk. Green cells indicate low-risk policies, yellow shows medium risk, and red indicates high-risk categories. Newer policies often show different fraud patterns than established ones.
+    </div>
+</div>
+
+<!-- 11. Top Risk Claims Timeline -->
+<div class="chart-container full-width">
+    <div class="chart-header">
+        <i class="fas fa-exclamation-circle"></i>
+        <h3>Top 10 Highest Risk Claims</h3>
+    </div>
+    <div style="max-height: 400px; overflow-y: auto;">
+        {% for claim in top_risk_claims %}
+        <div class="timeline-item">
+            <div class="risk-score">{{ "%.0f"|format(claim.prediction_score * 100) }}%</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ claim.claimant_name }} - {{ claim.claim_type }}</div>
+                <div style="font-size: 0.9rem; color: var(--muted);">
+                    Amount: ${{ "%.2f"|format(claim.claim_amount) }} | Date: {{ claim.created_at }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chart-explanation">
+        <strong>🚨 What this shows:</strong> This timeline lists the claims with the highest fraud risk scores. These require immediate attention and thorough investigation. The percentage indicates the AI's confidence level in detecting potential fraud.
+    </div>
+</div>
+
+<script>
+    // Wait for DOM and Chart.js to be ready
+    window.addEventListener('load', function() {
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded! Please check the CDN link.');
+            return;
+        }
+        
+        try {
+            // Chart.js configuration
+            Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text');
+            
+            // Get CSS variables for colors
+            const getCSSVar = (varName) => {
+                return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+            };
+            
+            // Helper function to safely get data
+            const safeGet = (obj, path, defaultValue) => {
+                try {
+                    return path.split('.').reduce((o, p) => o && o[p], obj) || defaultValue;
+                } catch (e) {
+                    return defaultValue;
+                }
+            };
+            
+            const primaryColor = getCSSVar('--primary');
+            const dangerColor = getCSSVar('--danger');
+            const successColor = getCSSVar('--success');
+            const warningColor = getCSSVar('--warning');
+            const mutedColor = getCSSVar('--muted');
+            
+            // 1. Risk Distribution Donut Chart
+            const riskCtx = document.getElementById('riskDistributionChart');
+            if (riskCtx) {
+            const riskLabels = [
+                {% for item in risk_distribution %}
+                '{{ item.risk_category }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+            const riskData = [
+                {% for item in risk_distribution %}
+                {{ item.count }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+            
+            // If no data, show placeholder
+            if (riskData.length === 0 || riskData.every(v => v === 0)) {
+                riskLabels.push('No Data');
+                riskData.push(1);
+            }
+            
+            new Chart(riskCtx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: riskLabels,
+            datasets: [{
+                data: riskData,
+                backgroundColor: [
+                    '#10b981', '#f59e0b', '#ef4444', '#7c2d12'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 15, font: { size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + ' claims';
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
+        },
+        plugins: [{
+            id: 'centerText',
+            beforeDraw: function(chart) {
+                const ctx = chart.ctx;
+                const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+                ctx.save();
+                ctx.font = 'bold 24px Segoe UI';
+                ctx.fillStyle = getCSSVar('--text');
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('{{ total_claims }}', centerX, centerY - 10);
+                ctx.font = '14px Segoe UI';
+                ctx.fillStyle = mutedColor;
+                ctx.fillText('Total Claims', centerX, centerY + 15);
+                ctx.restore();
+            }
+        }]
+    });
+            }
+    
+            // 2. Fraud Risk Scatter Plot
+            const scatterCtx = document.getElementById('scatterChart');
+            if (scatterCtx) {
+            const scatterData = {
+                fraud: [],
+                legitimate: []
+            };
+            
+            {% for item in risk_score_distribution %}
+            scatterData.{% if item.prediction_label == 'Fraud' %}fraud{% else %}legitimate{% endif %}.push({
+                x: {{ item.claim_amount }},
+                y: {{ (item.prediction_score * 100)|round(2) }}
+            });
+            {% endfor %}
+            
+            // If no data, add placeholder
+            if (scatterData.fraud.length === 0 && scatterData.legitimate.length === 0) {
+                scatterData.legitimate.push({ x: 0, y: 0 });
+            }
+            
+                new Chart(scatterCtx.getContext('2d'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Legitimate Claims',
+                            data: scatterData.legitimate,
+                            backgroundColor: primaryColor + '80',
+                            borderColor: primaryColor,
+                            borderWidth: 1,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }, {
+                            label: 'Fraud Detected',
+                            data: scatterData.fraud,
+                            backgroundColor: dangerColor + '80',
+                            borderColor: dangerColor,
+                            borderWidth: 1,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': Amount $' + context.parsed.x.toLocaleString() + ', Risk: ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Claim Amount ($)', font: { size: 14, weight: 'bold' } },
+                                beginAtZero: true,
+                                grid: { color: getCSSVar('--border') },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            },
+                            y: {
+                                title: { display: true, text: 'Fraud Risk Score (%)', font: { size: 14, weight: 'bold' } },
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: getCSSVar('--border') },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 3. Claim Type Chart
+            const typeCtx = document.getElementById('claimTypeChart');
+            if (typeCtx) {
+    const claimTypeData = {
+        {% for item in claims_by_type %}
+        '{{ item.claim_type }}': { count: {{ item.count }}, fraud: {{ item.fraud_count }}, avgAmount: {{ item.avg_amount|default(0) }} }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+    
+    new Chart(typeCtx.getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for item in claims_by_type %}
+                '{{ item.claim_type }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for item in claims_by_type %}
+                    {{ item.count }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+                ],
+                borderWidth: 2,
+                borderColor: getCSSVar('--surface')
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            const typeInfo = claimTypeData[label] || { fraud: 0 };
+                            const fraudRate = value > 0 ? ((typeInfo.fraud / value) * 100).toFixed(1) : '0.0';
+                            return label + ': ' + value + ' (' + percentage + '%) | Fraud Rate: ' + fraudRate + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+            }
+            
+            // 4. Gauge Chart (using doughnut chart styled as gauge)
+            const gaugeCtx = document.getElementById('gaugeChart');
+            if (gaugeCtx) {
+    const fraudRate = {{ (fraud_count / total_claims * 100) if total_claims > 0 else 0 }};
+    const gaugeColor = fraudRate > 30 ? dangerColor : fraudRate > 15 ? warningColor : successColor;
+    
+    new Chart(gaugeCtx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [fraudRate, 100 - fraudRate],
+                backgroundColor: [gaugeColor, getCSSVar('--border')],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            rotation: -90,
+            circumference: 180,
+            cutout: '75%',
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        },
+        plugins: [{
+            id: 'gaugeText',
+            beforeDraw: function(chart) {
+                const ctx = chart.ctx;
+                const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2 + 30;
+                ctx.save();
+                ctx.font = 'bold 36px Segoe UI';
+                ctx.fillStyle = gaugeColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(fraudRate.toFixed(1) + '%', centerX, centerY);
+                ctx.font = '16px Segoe UI';
+                ctx.fillStyle = mutedColor;
+                ctx.fillText('Fraud Detection Rate', centerX, centerY + 30);
+                ctx.restore();
+            }
+        }]
+    });
+            }
+            
+            // 5. Age Chart
+            const ageCtx = document.getElementById('ageChart');
+            if (ageCtx) {
+    new Chart(ageCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for item in age_analysis %}
+                '{{ item.age_group }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Total Claims',
+                data: [
+                    {% for item in age_analysis %}
+                    {{ item.total_claims }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: primaryColor + '80',
+                borderColor: primaryColor,
+                borderWidth: 2
+            }, {
+                label: 'Fraud Cases',
+                data: [
+                    {% for item in age_analysis %}
+                    {{ item.fraud_count }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: dangerColor + '80',
+                borderColor: dangerColor,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: getCSSVar('--border') } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+            }
+            
+            // 7. Amount Chart
+            const amountCtx = document.getElementById('amountChart');
+            if (amountCtx) {
+    const amountData = [
+        {% for item in amount_distribution %}
+        {{ item.count }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    const fraudRates = [
+        {% for item in amount_distribution %}
+        {{ (item.fraud_count / item.count * 100) if item.count > 0 else 0 }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    new Chart(amountCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for item in amount_distribution %}
+                '{{ item.amount_range }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Total Claims',
+                data: amountData,
+                backgroundColor: amountData.map((_, i) => {
+                    const rate = fraudRates[i];
+                    if (rate > 30) return dangerColor + 'CC';
+                    if (rate > 15) return warningColor + 'CC';
+                    return successColor + 'CC';
+                }),
+                borderColor: amountData.map((_, i) => {
+                    const rate = fraudRates[i];
+                    if (rate > 30) return dangerColor;
+                    if (rate > 15) return warningColor;
+                    return successColor;
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const index = context.dataIndex;
+                            return 'Fraud Rate: ' + fraudRates[index].toFixed(1) + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: getCSSVar('--border') } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+            }
+            
+            // 8. Gender Chart
+            const genderCtx = document.getElementById('genderChart');
+            if (genderCtx) {
+    new Chart(genderCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for item in gender_analysis %}
+                '{{ item.claimant_gender }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Total Claims',
+                data: [
+                    {% for item in gender_analysis %}
+                    {{ item.total_claims }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: primaryColor + '80',
+                borderColor: primaryColor,
+                borderWidth: 2
+            }, {
+                label: 'Fraud Cases',
+                data: [
+                    {% for item in gender_analysis %}
+                    {{ item.fraud_count }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: dangerColor + '80',
+                borderColor: dangerColor,
+                borderWidth: 2
+            }, {
+                label: 'Avg Risk Score (%)',
+                data: [
+                    {% for item in gender_analysis %}
+                    {{ (item.avg_risk_score * 100)|round }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                type: 'line',
+                borderColor: warningColor,
+                backgroundColor: warningColor + '40',
+                borderWidth: 3,
+                fill: false,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: getCSSVar('--border') },
+                    position: 'left'
+                },
+                y1: {
+                    beginAtZero: true,
+                    grid: { display: false },
+                    position: 'right'
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+            }
+            
+            // 3. Risk Factors Analysis by Claim Type
+            const correlationCtx = document.getElementById('correlationChart');
+            if (correlationCtx) {
+    const correlationData = [
+        {% for item in risk_correlation_data %}
+        {
+            claimType: '{{ item.claim_type }}',
+            avgRisk: {{ (item.avg_risk_score * 100)|round(2) }},
+            avgAmount: {{ (item.avg_amount / 1000)|round(1) }},
+            avgPrevious: {{ item.avg_previous_claims|round(2) }},
+            avgLocation: {{ item.avg_location_risk|round(2) }},
+            avgPolicyAge: {{ (item.avg_policy_age / 365)|round(1) }},
+            fraudRate: {{ (item.fraud_count / item.claim_count * 100) if item.claim_count > 0 else 0|round(2) }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const claimTypes = correlationData.map(function(d) { return d.claimType; });
+    
+    // Normalize data for comparison (0-100 scale)
+    const normalizeData = function(values) {
+        const min = Math.min.apply(null, values);
+        const max = Math.max.apply(null, values);
+        const range = max - min;
+        return values.map(function(v) {
+            return range > 0 ? ((v - min) / range) * 100 : 50;
+        });
+    };
+    
+    new Chart(correlationCtx.getContext('2d'), {
+        type: 'radar',
+        data: {
+            labels: ['Risk Score', 'Avg Amount (K)', 'Previous Claims', 'Location Risk', 'Policy Age (Years)', 'Fraud Rate'],
+            datasets: correlationData.map(function(item, idx) {
+                const colors = [primaryColor, successColor, warningColor, dangerColor, '#8b5cf6', '#ec4899'];
+                return {
+                    label: item.claimType,
+                    data: [
+                        item.avgRisk,
+                        item.avgAmount,
+                        item.avgPrevious * 20, // Scale up for visibility
+                        item.avgLocation * 100,
+                        item.avgPolicyAge * 10, // Scale up for visibility
+                        item.fraudRate
+                    ],
+                    borderColor: colors[idx % colors.length],
+                    backgroundColor: colors[idx % colors.length] + '40',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                };
+            })
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.r;
+                            const labels = ['Risk Score', 'Avg Amount (K)', 'Previous Claims', 'Location Risk', 'Policy Age (Years)', 'Fraud Rate'];
+                            const index = context.dataIndex;
+                            let displayValue = value;
+                            
+                            // Reverse scaling for display
+                            if (index === 2) displayValue = (value / 20).toFixed(2);
+                            else if (index === 4) displayValue = (value / 10).toFixed(1);
+                            else if (index === 3) displayValue = (value / 100).toFixed(2);
+                            else displayValue = value.toFixed(1);
+                            
+                            return label + ' - ' + labels[index] + ': ' + displayValue;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: getCSSVar('--border') },
+                    ticks: {
+                        display: false
+                    },
+                    pointLabels: {
+                        font: { size: 12, weight: 'bold' }
+                    }
+                }
+            }
+        }
+    });
+            }
+            
+            // 4. Temporal Pattern Chart (Day of Week + Hourly)
+            const temporalCtx = document.getElementById('temporalChart');
+            if (temporalCtx) {
+    const dayData = [
+        {% for item in day_of_week_pattern %}
+        { day: '{{ item.day_name }}', total: {{ item.total_claims }}, fraud: {{ item.fraud_count }}, risk: {{ (item.avg_risk_score * 100)|round(2) }} }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const hourData = [
+        {% for item in hourly_pattern %}
+        { hour: {{ item.hour }}, total: {{ item.total_claims }}, fraud: {{ item.fraud_count }}, risk: {{ (item.avg_risk_score * 100)|round(2) }} }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    new Chart(temporalCtx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: dayData.map(function(d) { return d.day.substring(0, 3); }),
+            datasets: [{
+                label: 'Total Claims',
+                data: dayData.map(function(d) { return d.total; }),
+                backgroundColor: primaryColor + '60',
+                borderColor: primaryColor,
+                borderWidth: 2,
+                yAxisID: 'y'
+            }, {
+                label: 'Fraud Cases',
+                data: dayData.map(function(d) { return d.fraud; }),
+                backgroundColor: dangerColor + '60',
+                borderColor: dangerColor,
+                borderWidth: 2,
+                yAxisID: 'y'
+            }, {
+                label: 'Avg Risk Score (%)',
+                data: dayData.map(function(d) { return d.risk; }),
+                type: 'line',
+                borderColor: warningColor,
+                backgroundColor: warningColor + '20',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.4,
+                yAxisID: 'y1',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                title: {
+                    display: true,
+                    text: 'Fraud Patterns by Day of Week',
+                    font: { size: 16, weight: 'bold' },
+                    padding: { bottom: 20 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    position: 'left',
+                    grid: { color: getCSSVar('--border') },
+                    title: { display: true, text: 'Number of Claims' }
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: { display: false },
+                    title: { display: true, text: 'Risk Score (%)' },
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+            
+            // Create hourly chart below (use existing container)
+            const hourlyChartContainer = document.getElementById('hourlyChartContainer');
+            const hourlyCanvas = document.getElementById('hourlyChart');
+            
+            if (hourlyChartContainer && hourlyCanvas) {
+                new Chart(hourlyCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: hourData.map(function(d) { 
+                            const hour = parseInt(d.hour);
+                            return (hour < 10 ? '0' : '') + hour + ':00';
+                        }),
+                        datasets: [{
+                            label: 'Total Claims',
+                            data: hourData.map(function(d) { return d.total; }),
+                            backgroundColor: primaryColor + '60',
+                            borderColor: primaryColor,
+                            borderWidth: 2
+                        }, {
+                            label: 'Fraud Cases',
+                            data: hourData.map(function(d) { return d.fraud; }),
+                            backgroundColor: dangerColor + '60',
+                            borderColor: dangerColor,
+                            borderWidth: 2
+                        }, {
+                            label: 'Avg Risk Score (%)',
+                            data: hourData.map(function(d) { return d.risk; }),
+                            type: 'line',
+                            borderColor: warningColor,
+                            backgroundColor: warningColor + '20',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            yAxisID: 'y1',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: {
+                                display: true,
+                                text: 'Fraud Patterns by Hour of Day (Last 7 Days)',
+                                font: { size: 16, weight: 'bold' },
+                                padding: { bottom: 20 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                position: 'left',
+                                grid: { color: getCSSVar('--border') },
+                                title: { display: true, text: 'Number of Claims' }
+                            },
+                            y1: {
+                                beginAtZero: true,
+                                position: 'right',
+                                grid: { display: false },
+                                title: { display: true, text: 'Risk Score (%)' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+            }
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+            // Show error message to user
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = 'padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; margin: 1rem;';
+            errorDiv.textContent = 'Error loading charts: ' + error.message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.container').firstChild);
+        }
+    }); // End of window load event
+</script>
+{% endif %}
+{% endblock %}

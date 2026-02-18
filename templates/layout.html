@@ -21,6 +21,7 @@
                     <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
                     <a class="nav-link" href="{{ url_for('upload_claim') }}">Upload Claim</a>
                     <a class="nav-link" href="{{ url_for('claims_history') }}">Claims History</a>
+                    <a class="nav-link" href="{{ url_for('analytics') }}">Analytics</a>
                     {% if session.get('role') == 'admin' %}
                     <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
                     {% endif %}

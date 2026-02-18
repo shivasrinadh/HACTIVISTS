@@ -414,6 +414,289 @@ def bootstrap():
     ensure_model_exists()
 
 
+@app.route("/analytics")
+@login_required
+def analytics():
+    """Comprehensive analytics dashboard with visualizations"""
+    db = get_db()
+    
+    # Initialize all variables to prevent undefined errors
+    risk_score_distribution = []
+    risk_correlation_data = []
+    hourly_pattern = []
+    day_of_week_pattern = []
+    
+    # Basic stats
+    total_claims = db.execute("SELECT COUNT(*) AS count FROM claims").fetchone()["count"]
+    fraud_count = db.execute(
+        "SELECT COUNT(*) AS count FROM claims WHERE prediction_label = 'Fraud'"
+    ).fetchone()["count"]
+    legitimate_count = total_claims - fraud_count
+    
+    # Claims by type
+    claims_by_type = db.execute(
+        """
+        SELECT claim_type, COUNT(*) AS count,
+               SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+               AVG(claim_amount) AS avg_amount
+        FROM claims
+        GROUP BY claim_type
+        ORDER BY count DESC
+        """
+    ).fetchall()
+    
+    # Claims trend over time (last 30 days)
+    claims_trend = db.execute(
+        """
+        SELECT DATE(created_at) AS date, COUNT(*) AS count,
+               SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count
+        FROM claims
+        WHERE created_at >= datetime('now', '-30 days')
+        GROUP BY DATE(created_at)
+        ORDER BY date ASC
+        """
+    ).fetchall()
+    
+    # Risk score distribution
+    risk_distribution = db.execute(
+        """
+        SELECT 
+            CASE 
+                WHEN prediction_score < 0.3 THEN 'Low Risk (0-30%)'
+                WHEN prediction_score < 0.6 THEN 'Medium Risk (30-60%)'
+                WHEN prediction_score < 0.8 THEN 'High Risk (60-80%)'
+                ELSE 'Critical Risk (80-100%)'
+            END AS risk_category,
+            COUNT(*) AS count
+        FROM claims
+        GROUP BY risk_category
+        ORDER BY 
+            CASE risk_category
+                WHEN 'Low Risk (0-30%)' THEN 1
+                WHEN 'Medium Risk (30-60%)' THEN 2
+                WHEN 'High Risk (60-80%)' THEN 3
+                WHEN 'Critical Risk (80-100%)' THEN 4
+            END
+        """
+    ).fetchall()
+    
+    # Age and policy age analysis
+    age_analysis = db.execute(
+        """
+        SELECT 
+            CASE 
+                WHEN claimant_age < 25 THEN '18-24'
+                WHEN claimant_age < 35 THEN '25-34'
+                WHEN claimant_age < 45 THEN '35-44'
+                WHEN claimant_age < 55 THEN '45-54'
+                WHEN claimant_age < 65 THEN '55-64'
+                ELSE '65+'
+            END AS age_group,
+            COUNT(*) AS total_claims,
+            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+            AVG(prediction_score) AS avg_risk_score
+        FROM claims
+        WHERE claimant_age IS NOT NULL
+        GROUP BY age_group
+        ORDER BY age_group
+        """
+    ).fetchall()
+    
+    # Policy age vs fraud risk
+    policy_age_analysis = db.execute(
+        """
+        SELECT 
+            CASE 
+                WHEN age_of_policy_days < 30 THEN 'New (0-30 days)'
+                WHEN age_of_policy_days < 90 THEN 'Recent (30-90 days)'
+                WHEN age_of_policy_days < 180 THEN 'Young (90-180 days)'
+                WHEN age_of_policy_days < 365 THEN 'Mature (180-365 days)'
+                ELSE 'Established (365+ days)'
+            END AS policy_age_group,
+            COUNT(*) AS total_claims,
+            AVG(prediction_score) AS avg_risk_score,
+            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count
+        FROM claims
+        GROUP BY policy_age_group
+        ORDER BY 
+            CASE policy_age_group
+                WHEN 'New (0-30 days)' THEN 1
+                WHEN 'Recent (30-90 days)' THEN 2
+                WHEN 'Young (90-180 days)' THEN 3
+                WHEN 'Mature (180-365 days)' THEN 4
+                WHEN 'Established (365+ days)' THEN 5
+            END
+        """
+    ).fetchall()
+    
+    # Gender analysis
+    gender_analysis = db.execute(
+        """
+        SELECT 
+            claimant_gender,
+            COUNT(*) AS total_claims,
+            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+            AVG(prediction_score) AS avg_risk_score,
+            AVG(claim_amount) AS avg_amount
+        FROM claims
+        WHERE claimant_gender IS NOT NULL AND claimant_gender != ''
+        GROUP BY claimant_gender
+        """
+    ).fetchall()
+    
+    # Claim amount distribution
+    amount_distribution = db.execute(
+        """
+        SELECT 
+            CASE 
+                WHEN claim_amount < 1000 THEN 'Under $1K'
+                WHEN claim_amount < 5000 THEN '$1K-$5K'
+                WHEN claim_amount < 10000 THEN '$5K-$10K'
+                WHEN claim_amount < 25000 THEN '$10K-$25K'
+                WHEN claim_amount < 50000 THEN '$25K-$50K'
+                ELSE 'Over $50K'
+            END AS amount_range,
+            COUNT(*) AS count,
+            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count
+        FROM claims
+        GROUP BY amount_range
+        ORDER BY 
+            CASE amount_range
+                WHEN 'Under $1K' THEN 1
+                WHEN '$1K-$5K' THEN 2
+                WHEN '$5K-$10K' THEN 3
+                WHEN '$10K-$25K' THEN 4
+                WHEN '$25K-$50K' THEN 5
+                WHEN 'Over $50K' THEN 6
+            END
+        """
+    ).fetchall()
+    
+    # Fraud Risk Score Distribution (for scatter plot)
+    try:
+        risk_score_distribution = db.execute(
+            """
+            SELECT 
+                claim_amount,
+                prediction_score,
+                prediction_label,
+                claim_type,
+                number_of_previous_claims,
+                location_risk_score,
+                age_of_policy_days
+            FROM claims
+            ORDER BY prediction_score DESC
+            LIMIT 500
+            """
+        ).fetchall()
+    except Exception as e:
+        # Fallback if query fails
+        risk_score_distribution = []
+    
+    # Risk Factors Correlation Matrix data
+    try:
+        risk_correlation_data = db.execute(
+            """
+            SELECT 
+                claim_type,
+                AVG(prediction_score) AS avg_risk_score,
+                AVG(claim_amount) AS avg_amount,
+                AVG(number_of_previous_claims) AS avg_previous_claims,
+                AVG(location_risk_score) AS avg_location_risk,
+                AVG(age_of_policy_days) AS avg_policy_age,
+                COUNT(*) AS claim_count,
+                SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count
+            FROM claims
+            GROUP BY claim_type
+            """
+        ).fetchall()
+    except Exception:
+        risk_correlation_data = []
+    
+    # Hourly/Daily pattern analysis
+    try:
+        hourly_pattern = db.execute(
+            """
+            SELECT 
+                strftime('%H', created_at) AS hour,
+                COUNT(*) AS total_claims,
+                SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+                AVG(prediction_score) AS avg_risk_score
+            FROM claims
+            WHERE created_at >= datetime('now', '-7 days')
+            GROUP BY hour
+            ORDER BY hour ASC
+            """
+        ).fetchall()
+    except Exception:
+        hourly_pattern = []
+    
+    # Day of week pattern
+    try:
+        day_of_week_pattern = db.execute(
+            """
+            SELECT 
+                CASE CAST(strftime('%w', created_at) AS INTEGER)
+                    WHEN 0 THEN 'Sunday'
+                    WHEN 1 THEN 'Monday'
+                    WHEN 2 THEN 'Tuesday'
+                    WHEN 3 THEN 'Wednesday'
+                    WHEN 4 THEN 'Thursday'
+                    WHEN 5 THEN 'Friday'
+                    WHEN 6 THEN 'Saturday'
+                END AS day_name,
+                COUNT(*) AS total_claims,
+                SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+                AVG(prediction_score) AS avg_risk_score
+            FROM claims
+            WHERE created_at >= datetime('now', '-30 days')
+            GROUP BY day_name
+            ORDER BY 
+                CASE day_name
+                    WHEN 'Sunday' THEN 0
+                    WHEN 'Monday' THEN 1
+                    WHEN 'Tuesday' THEN 2
+                    WHEN 'Wednesday' THEN 3
+                    WHEN 'Thursday' THEN 4
+                    WHEN 'Friday' THEN 5
+                    WHEN 'Saturday' THEN 6
+                END
+            """
+        ).fetchall()
+    except Exception:
+        day_of_week_pattern = []
+    
+    # Top risk indicators
+    top_risk_claims = db.execute(
+        """
+        SELECT claimant_name, claim_type, claim_amount, prediction_score, created_at
+        FROM claims
+        WHERE prediction_label = 'Fraud'
+        ORDER BY prediction_score DESC
+        LIMIT 10
+        """
+    ).fetchall()
+    
+    return render_template(
+        "analytics.html",
+        total_claims=total_claims,
+        fraud_count=fraud_count,
+        legitimate_count=legitimate_count,
+        claims_by_type=claims_by_type,
+        claims_trend=claims_trend,
+        risk_distribution=risk_distribution,
+        age_analysis=age_analysis,
+        policy_age_analysis=policy_age_analysis,
+        gender_analysis=gender_analysis,
+        amount_distribution=amount_distribution,
+        risk_score_distribution=risk_score_distribution,
+        risk_correlation_data=risk_correlation_data,
+        hourly_pattern=hourly_pattern,
+        day_of_week_pattern=day_of_week_pattern,
+        top_risk_claims=top_risk_claims,
+    )
+
+
 @app.route("/test-email")
 @login_required
 @admin_required
