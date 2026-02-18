@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<section class="card" style="margin-bottom: 1rem;">
+    <h3 style="margin-top:0;">System Configuration</h3>
+    <p style="margin-bottom: 1rem; color: #666;">Test and verify email service configuration:</p>
+    <form method="GET" action="{{ url_for('test_email_route') }}" style="display: inline;">
+        <button type="submit" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">
+            ✓ Test Email Service
+        </button>
+    </form>
+    <p style="font-size: 12px; color: #999; margin-top: 0.5rem;">Sends a test email to your configured email address.
+        Check console logs for details.</p>
+</section>
+
+<section class="grid grid-4" style="margin-bottom: 1rem;">
+    <article class="metric">
+        <h4>Total Users</h4>
+        <p>{{ user_count }}</p>
+    </article>
+    <article class="metric">
+        <h4>Total Claims</h4>
+        <p>{{ claim_count }}</p>
+    </article>
+    <article class="metric">
+        <h4>Fraud Flagged</h4>
+        <p>{{ fraud_count }}</p>
+    </article>
+    <article class="metric">
+        <h4>Detection Ratio</h4>
+        <p>{{ "%.1f"|format((fraud_count / claim_count * 100) if claim_count else 0) }}%</p>
+    </article>
+</section>
+
+<section class="card" style="margin-bottom: 1rem;">
+    <h3 style="margin-top:0;">Team Activity</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Claims Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.claims_submitted }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="muted">No users available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card">
+    <h3 style="margin-top:0;">High-Risk Claims</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Claimant</th>
+                    <th>Amount</th>
+                    <th>Fraud Score</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in high_risk_claims %}
+                <tr>
+                    <td>{{ claim.id }}</td>
+                    <td>{{ claim.claimant_name }}</td>
+                    <td>${{ "%.2f"|format(claim.claim_amount) }}</td>
+                    <td>{{ "%.2f"|format(claim.prediction_score * 100) }}%</td>
+                    <td>{{ claim.created_at }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="muted">No high-risk claims yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% block title %}Prediction Result | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<!-- Decision Popup Modal -->
+<div id="decisionModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div
+        style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 500px; width: 90%; text-align: center;">
+        {% if claim.prediction_label == 'Fraud' %}
+        <div style="font-size: 60px; margin-bottom: 20px;">⚠️</div>
+        <h2 style="color: #dc3545; margin: 0 0 15px 0;">Claim Rejected</h2>
+        <p style="color: #666; margin: 0 0 20px 0; font-size: 16px;">Your claim has been flagged for further review due
+            to fraud risk indicators.</p>
+        {% else %}
+        <div style="font-size: 60px; margin-bottom: 20px;">✓</div>
+        <h2 style="color: #28a745; margin: 0 0 15px 0;">Claim Approved</h2>
+        <p style="color: #666; margin: 0 0 20px 0; font-size: 16px;">Your claim has been approved for processing.</p>
+        {% endif %}
+
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin: 5px 0; color: #333;"><strong>Type:</strong> {{ claim.claim_type }}</p>
+            <p style="margin: 5px 0; color: #333;"><strong>Amount:</strong> ${{ "%.2f"|format(claim.claim_amount) }}</p>
+            <p style="margin: 5px 0; color: #333;"><strong>Risk Score:</strong> {{ "%.2f"|format(claim.prediction_score
+                * 100) }}%</p>
+        </div>
+
+        {% if claim.email_sent == 1 %}
+        <div
+            style="background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+            <strong>✓ Notification email sent to {{ claim.claimant_email }}</strong>
+        </div>
+        {% else %}
+        <div
+            style="background: #e2e3e5; color: #666; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6c757d;">
+            <strong>📧 Email notification not sent (service not configured)</strong>
+        </div>
+        {% endif %}
+
+        <button onclick="closeModal()"
+            style="background: #1d4ed8; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; min-width: 150px;">
+            Continue
+        </button>
+    </div>
+</div>
+
+<section class="card">
+    <h3 style="margin-top:0;">Prediction Result</h3>
+
+    {% if claim.email_sent == 1 %}
+    <div
+        style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 12px; margin-bottom: 1.5rem; border-radius: 4px;">
+        <p style="margin: 0; color: #155724; font-weight: 500;">✓ Notification email has been sent to {{
+            claim.claimant_email }}</p>
+    </div>
+    {% endif %}
+
+    <div class="grid form-grid" style="margin-top: 0.8rem;">
+        <div>
+            <p class="muted">Claimant</p>
+            <strong>{{ claim.claimant_name }}</strong>
+        </div>
+        <div>
+            <p class="muted">Email</p>
+            <strong>{{ claim.claimant_email }}</strong>
+        </div>
+        <div>
+            <p class="muted">Claim Type</p>
+            <strong>{{ claim.claim_type }}</strong>
+        </div>
+        <div>
+            <p class="muted">Claim Amount</p>
+            <strong>${{ "%.2f"|format(claim.claim_amount) }}</strong>
+        </div>
+        <div>
+            <p class="muted">Predicted Label</p>
+            {% if claim.prediction_label == 'Fraud' %}
+            <span class="badge badge-danger">Fraud</span>
+            {% else %}
+            <span class="badge badge-success">Legitimate</span>
+            {% endif %}
+        </div>
+        <div>
+            <p class="muted">Fraud Probability</p>
+            <strong>{{ "%.2f"|format(claim.prediction_score * 100) }}%</strong>
+        </div>
+        <div>
+            <p class="muted">Submitted At</p>
+            <strong>{{ claim.created_at }}</strong>
+        </div>
+        {% if claim.police_report_number %}
+        <div>
+            <p class="muted">Police Report Number</p>
+            <strong>{{ claim.police_report_number }}</strong>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if claim.claim_image %}
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <h4 style="margin: 0 0 1rem 0;">Claim Evidence</h4>
+        <img src="{{ url_for('uploaded_file', filename=claim.claim_image) }}" alt="Claim evidence"
+            style="max-width: 400px; max-height: 300px; border-radius: 10px; border: 1px solid var(--border);">
+    </div>
+    {% endif %}
+
+    <div class="actions" style="margin-top: 1rem;">
+        <a class="btn btn-primary" href="{{ url_for('upload_claim') }}">Submit Another Claim</a>
+        <a class="btn btn-secondary" href="{{ url_for('claims_history') }}">View History</a>
+    </div>
+</section>
+
+<script>
+    function closeModal() {
+        document.getElementById('decisionModal').style.display = 'none';
+    }
+
+    // Show modal on page load
+    window.addEventListener('load', function () {
+        document.getElementById('decisionModal').style.display = 'flex';
+    });
+
+    // Close modal when clicking outside of it
+    document.getElementById('decisionModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

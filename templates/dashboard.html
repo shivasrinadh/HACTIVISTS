@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<section class="grid grid-4" style="margin-bottom: 1rem;">
+    <article class="metric">
+        <h4>Total Claims</h4>
+        <p>{{ total_claims }}</p>
+    </article>
+    <article class="metric">
+        <h4>Flagged Claims</h4>
+        <p>{{ flagged_claims }}</p>
+    </article>
+    <article class="metric">
+        <h4>Safe Claims</h4>
+        <p>{{ safe_claims }}</p>
+    </article>
+    <article class="metric">
+        <h4>Fraud Rate</h4>
+        <p>{{ "%.1f"|format(fraud_rate) }}%</p>
+    </article>
+</section>
+
+<section class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:0.8rem;">
+        <h3 style="margin:0;">Recent Claims</h3>
+        <a class="btn btn-secondary" href="{{ url_for('upload_claim') }}">+ New Claim</a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    {% if session.get('role') == 'admin' %}<th>User</th>{% endif %}
+                    <th>Claimant</th>
+                    <th>Amount</th>
+                    <th>Prediction</th>
+                    <th>Risk Score</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in recent_claims %}
+                <tr>
+                    {% if session.get('role') == 'admin' %}<td>{{ claim.username }}</td>{% endif %}
+                    <td>{{ claim.claimant_name }}</td>
+                    <td>${{ "%.2f"|format(claim.claim_amount) }}</td>
+                    <td>
+                        {% if claim.prediction_label == "Fraud" %}
+                        <span class="badge badge-danger">Fraud</span>
+                        {% else %}
+                        <span class="badge badge-success">Legitimate</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ "%.2f"|format(claim.prediction_score * 100) }}%</td>
+                    <td>{{ claim.created_at }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="muted">No claims submitted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card" style="margin-top: 1.5rem; background-color: var(--card-light); border-left: 4px solid #1d4ed8;">
+    <h3 style="margin-top: 0; color: #1d4ed8;">📧 Need Help?</h3>
+    <p>For support, questions, or assistance with your claims:</p>
+    <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
+        <a href="mailto:insuranceclaimwatchai@gmail.com" class="btn btn-primary">📧 Email Support</a>
+        <span style="color: #666;">insuranceclaimwatchai@gmail.com</span>
+    </div>
+    <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">We typically respond within 24 hours</p>
+</section>
+{% endblock %}

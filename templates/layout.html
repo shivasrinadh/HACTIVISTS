@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClaimWatch AI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="app-shell">
+        {% if session.get('user_id') %}
+        <header class="topbar">
+            <div class="topbar-inner">
+                <a href="{{ url_for('index') }}" class="brand">
+                    <span class="brand-badge">CW</span>
+                    <span>ClaimWatch AI</span>
+                </a>
+                <nav class="nav-links">
+                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('upload_claim') }}">Upload Claim</a>
+                    <a class="nav-link" href="{{ url_for('claims_history') }}">Claims History</a>
+                    {% if session.get('role') == 'admin' %}
+                    <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                    {% endif %}
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+                </nav>
+            </div>
+        </header>
+        {% endif %}
+
+        <main class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="app-footer"
+            style="border-top: 1px solid var(--border-color); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 3rem;">
+            <p style="margin: 0.5rem 0;">📧 <strong>Support:</strong> <a href="mailto:insuranceclaimwatchai@gmail.com"
+                    style="color: #1d4ed8; text-decoration: none;">insuranceclaimwatchai@gmail.com</a></p>
+            <p style="margin: 0.5rem 0;">&copy; 2026 ClaimWatch AI. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

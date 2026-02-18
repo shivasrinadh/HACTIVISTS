@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+
+{% block title %}Upload Claim | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h3 style="margin-top: 0;">Upload Insurance Claim</h3>
+    <p class="muted">Select claim type to see relevant fields for detailed information.</p>
+
+    <form id="claim-form" method="post" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div>
+                <label for="claimant_name">Claimant Name</label>
+                <input data-required="true" id="claimant_name" name="claimant_name" type="text"
+                    value="{{ form_data.get('claimant_name', '') }}" required>
+            </div>
+            <div>
+                <label for="claimant_email">Email Address</label>
+                <input data-required="true" id="claimant_email" name="claimant_email" type="email"
+                    placeholder="your@email.com" value="{{ form_data.get('claimant_email', '') }}" required>
+            </div>
+            <div>
+                <label for="claimant_age">Age</label>
+                <input data-required="true" id="claimant_age" name="claimant_age" type="number" min="18" max="120"
+                    value="{{ form_data.get('claimant_age', '') }}" required>
+            </div>
+            <div>
+                <label for="claimant_gender">Gender</label>
+                <select data-required="true" id="claimant_gender" name="claimant_gender" required>
+                    {% set selected_gender = form_data.get('claimant_gender', '') %}
+                    <option value="">Select gender</option>
+                    <option value="Male" {% if selected_gender=='Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if selected_gender=='Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if selected_gender=='Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="claim_type">Claim Type</label>
+                <select data-required="true" id="claim_type" name="claim_type" required>
+                    {% set selected_type = form_data.get('claim_type', '') %}
+                    <option value="">Select type</option>
+                    <option value="Auto" {% if selected_type=='Auto' %}selected{% endif %}>Auto</option>
+                    <option value="Health" {% if selected_type=='Health' %}selected{% endif %}>Health</option>
+                    <option value="Property" {% if selected_type=='Property' %}selected{% endif %}>Property</option>
+                    <option value="Travel" {% if selected_type=='Travel' %}selected{% endif %}>Travel</option>
+                    <option value="Life" {% if selected_type=='Life' %}selected{% endif %}>Life</option>
+                </select>
+            </div>
+            <div>
+                <label for="incident_date">Incident Date</label>
+                <input data-required="true" id="incident_date" name="incident_date" type="date"
+                    value="{{ form_data.get('incident_date', '') }}" required>
+            </div>
+            <div>
+                <label for="claim_amount">Claim Amount (USD)</label>
+                <input data-required="true" id="claim_amount" name="claim_amount" type="number" min="1" step="0.01"
+                    value="{{ form_data.get('claim_amount', '') }}" required>
+            </div>
+            <div>
+                <label for="age_of_policy_days">Policy Age (Days)</label>
+                <input data-required="true" id="age_of_policy_days" name="age_of_policy_days" type="number" min="0"
+                    step="1" value="{{ form_data.get('age_of_policy_days', '') }}" required>
+            </div>
+            <div>
+                <label for="number_of_previous_claims">Previous Claims</label>
+                <input data-required="true" id="number_of_previous_claims" name="number_of_previous_claims"
+                    type="number" min="0" step="1" value="{{ form_data.get('number_of_previous_claims', '') }}"
+                    required>
+            </div>
+            <div>
+                <label for="location_risk_score">Location Risk Score (0 - 1)</label>
+                <input data-required="true" id="location_risk_score" name="location_risk_score" type="number" min="0"
+                    max="1" step="0.01" value="{{ form_data.get('location_risk_score', '') }}" required>
+            </div>
+            <div>
+                <label for="police_report_filed">Police Report Filed</label>
+                {% set police = form_data.get('police_report_filed', '0') %}
+                <select data-required="true" id="police_report_filed" name="police_report_filed" required>
+                    <option value="1" {% if police=='1' %}selected{% endif %}>Yes</option>
+                    <option value="0" {% if police !='1' %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            <div id="police-report-number-field" style="display: none;">
+                <label for="police_report_number">Police Report Number</label>
+                <input id="police_report_number" name="police_report_number" type="text"
+                    placeholder="e.g., POL-2025-12345" value="{{ form_data.get('police_report_number', '') }}">
+            </div>
+            <div>
+                <label for="witnesses">Witnesses</label>
+                <input data-required="true" id="witnesses" name="witnesses" type="number" min="0" step="1"
+                    value="{{ form_data.get('witnesses', '') }}" required>
+            </div>
+        </div>
+
+        <!-- Dynamic Fields Based on Claim Type -->
+        <div id="dynamic-fields" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        </div>
+
+        <div>
+            <label for="description">Incident Description</label>
+            <textarea id="description" name="description"
+                placeholder="Provide brief context">{{ form_data.get('description', '') }}</textarea>
+        </div>
+
+        <div>
+            <label for="claim_image">Claim Evidence (Image)</label>
+            <div class="file-upload-wrapper">
+                <input data-required="false" id="claim_image" name="claim_image" type="file" accept="image/*" />
+                <p class="file-help">Supported formats: JPG, PNG, GIF (Max 5MB)</p>
+                <div id="image-preview" style="margin-top: 1rem; display: none;">
+                    <img id="preview-img"
+                        style="max-width: 200px; border-radius: 8px; border: 1px solid var(--border);" />
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted);" id="file-name"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" type="submit">Predict Fraud Risk</button>
+            <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+        </div>
+    </form>
+
+    <script>
+        // Dynamic fields configuration based on claim type
+        const claimTypeFields = {
+            'Auto': [
+                { name: 'vehicle_make', label: 'Vehicle Make', type: 'text', placeholder: 'e.g., Toyota, Honda' },
+                { name: 'vehicle_model', label: 'Vehicle Model', type: 'text', placeholder: 'e.g., Camry, Civic' },
+                { name: 'vehicle_year', label: 'Vehicle Year', type: 'number', min: 1980, max: 2099 },
+                { name: 'num_vehicles', label: 'Number of Vehicles Involved', type: 'number', min: 1 },
+                { name: 'property_damage', label: 'Property Damage', type: 'select', options: ['Yes', 'No'] }
+            ],
+            'Health': [
+                { name: 'hospital_name', label: 'Hospital/Clinic Name', type: 'text', placeholder: 'e.g., St. Mary Hospital' },
+                { name: 'treatment_type', label: 'Treatment Type', type: 'text', placeholder: 'e.g., Surgery, Medication' },
+                { name: 'num_days_hospitalized', label: 'Days Hospitalized', type: 'number', min: 0 },
+                { name: 'pre_existing', label: 'Pre-existing Condition', type: 'select', options: ['Yes', 'No'] }
+            ],
+            'Property': [
+                { name: 'property_type', label: 'Property Type', type: 'select', options: ['House', 'Apartment', 'Commercial', 'Other'] },
+                { name: 'property_damage_type', label: 'Damage Type', type: 'text', placeholder: 'e.g., Fire, Theft, Water' },
+                { name: 'repair_cost', label: 'Estimated Repair Cost (USD)', type: 'number', min: 0, step: 0.01 },
+                { name: 'police_involved', label: 'Police Involved', type: 'select', options: ['Yes', 'No'] }
+            ],
+            'Travel': [
+                { name: 'trip_destination', label: 'Trip Destination', type: 'text', placeholder: 'e.g., Paris, Tokyo' },
+                { name: 'trip_duration', label: 'Trip Duration (days)', type: 'number', min: 1 },
+                { name: 'reason_for_claim', label: 'Reason for Claim', type: 'text', placeholder: 'e.g., Cancellation, Lost Luggage' },
+                { name: 'coverage_type', label: 'Coverage Type', type: 'select', options: ['Trip Cancellation', 'Lost Luggage', 'Medical', 'Other'] }
+            ],
+            'Life': [
+                { name: 'applicant_health', label: 'Health Status', type: 'select', options: ['Good', 'Fair', 'Poor'] },
+                { name: 'policy_duration_years', label: 'Policy Duration (years)', type: 'number', min: 1 },
+                { name: 'beneficiary_relationship', label: 'Beneficiary Relationship', type: 'text', placeholder: 'e.g., Spouse, Child' },
+                { name: 'death_circumstances', label: 'Death Circumstances', type: 'text', placeholder: 'Brief description' }
+            ]
+        };
+
+        function generateDynamicFields() {
+            const claimType = document.getElementById('claim_type').value;
+            const dynamicFieldsContainer = document.getElementById('dynamic-fields');
+            dynamicFieldsContainer.innerHTML = '';
+
+            if (claimType && claimTypeFields[claimType]) {
+                const heading = document.createElement('h4');
+                heading.textContent = claimType + ' Claim Details';
+                heading.style.color = 'var(--primary)';
+                heading.style.fontSize = '1rem';
+                heading.style.margin = '0 0 1rem 0';
+                heading.style.textTransform = 'uppercase';
+                heading.style.letterSpacing = '0.05em';
+                dynamicFieldsContainer.appendChild(heading);
+
+                const formGrid = document.createElement('div');
+                formGrid.className = 'form-grid';
+
+                claimTypeFields[claimType].forEach(field => {
+                    const fieldDiv = document.createElement('div');
+
+                    if (field.type === 'select') {
+                        let optionsHtml = '<option value="">Select</option>';
+                        field.options.forEach(opt => {
+                            optionsHtml += '<option value="' + opt + '">' + opt + '</option>';
+                        });
+                        fieldDiv.innerHTML = '<label for="' + field.name + '">' + field.label + '</label>' +
+                            '<select name="' + field.name + '" id="' + field.name + '">' + optionsHtml + '</select>';
+                    } else {
+                        let attrs = 'type="' + field.type + '" id="' + field.name + '" name="' + field.name + '"';
+                        if (field.min !== undefined) attrs += ' min="' + field.min + '"';
+                        if (field.max !== undefined) attrs += ' max="' + field.max + '"';
+                        if (field.step !== undefined) attrs += ' step="' + field.step + '"';
+                        if (field.placeholder) attrs += ' placeholder="' + field.placeholder + '"';
+
+                        fieldDiv.innerHTML = '<label for="' + field.name + '">' + field.label + '</label>' +
+                            '<input ' + attrs + '>';
+                    }
+                    formGrid.appendChild(fieldDiv);
+                });
+
+                dynamicFieldsContainer.appendChild(formGrid);
+            }
+        }
+
+        // Image preview functionality
+        document.getElementById('claim_image').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
+            const fileName = document.getElementById('file-name');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    fileName.textContent = 'File: ' + file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Police report number visibility toggle
+        function togglePoliceReportNumber() {
+            const policeReportFiled = document.getElementById('police_report_filed').value;
+            const policeReportField = document.getElementById('police-report-number-field');
+            const policeReportInput = document.getElementById('police_report_number');
+
+            if (policeReportFiled === '1') {
+                policeReportField.style.display = 'block';
+                policeReportInput.required = true;
+            } else {
+                policeReportField.style.display = 'none';
+                policeReportInput.required = false;
+                policeReportInput.value = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            generateDynamicFields();
+            togglePoliceReportNumber();
+            document.getElementById('claim_type').addEventListener('change', generateDynamicFields);
+            document.getElementById('police_report_filed').addEventListener('change', togglePoliceReportNumber);
+        });
+    </script>
+</section>
+{% endblock %}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaimWatch AI - Insurance Fraud Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="landing-page">
+        <!-- Dark Mode Toggle (Top Right) -->
+        <button class="dark-mode-toggle-fixed" id="darkModeToggle" title="Toggle dark mode">
+            <span class="toggle-icon">🌙</span>
+        </button>
+
+        <!-- Header Navigation -->
+        <header class="landing-header">
+            <div class="header-container">
+                <div class="header-brand">
+                    <span class="brand-badge">CW</span>
+                    <span class="brand-text">CLAIMWATCH AI</span>
+                </div>
+                <nav class="header-nav">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Hero Content -->
+        <section class="landing-hero">
+            <div class="hero-background-pattern">
+                <div class="geometric-element geo-1"></div>
+                <div class="geometric-element geo-2"></div>
+                <div class="geometric-element geo-3"></div>
+            </div>
+
+            <div class="hero-wrapper">
+                <div class="hero-text-content">
+                    <h1 class="main-title">Insurance<br>Claims.</h1>
+                    <p class="main-subtitle">
+                        Insurance Fraud Detection can be prevented by analyzing the previous fraud data and detecting
+                        same trends.
+                    </p>
+                    <a href="{{ url_for('login') }}" class="btn-get-started">Get Started</a>
+                </div>
+
+                <div class="hero-image-container">
+                    <div class="image-placeholder">
+                        <div class="shape-3d"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="landing-features">
+            <div class="features-container">
+                <h2>Why Choose ClaimWatch AI?</h2>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Real-Time Detection</h3>
+                        <p>Instantly analyze claims and identify fraud patterns</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure & Compliant</h3>
+                        <p>Enterprise-grade security with full regulatory compliance</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">📊</div>
+                        <h3>Advanced Analytics</h3>
+                        <p>Comprehensive insights and detailed fraud analysis</p>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Powered</h3>
+                        <p>Machine learning that continuously improves detection</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact" class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>ClaimWatch AI</h4>
+                    <p>Advanced insurance fraud detection platform</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact & Support</h4>
+                    <ul>
+                        <li><a href="mailto:insuranceclaimwatchai@gmail.com">📧 insuranceclaimwatchai@gmail.com</a></li>
+                        <li><a href="#">Help & FAQ</a></li>
+                        <li><a href="#">Support Chat</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 ClaimWatch AI. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
+</body>
+
+</html>

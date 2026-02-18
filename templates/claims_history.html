@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}Claims History | ClaimWatch AI{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h3 style="margin-top:0;">Claims History</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    {% if session.get('role') == 'admin' %}<th>User</th>{% endif %}
+                    <th>Claimant</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Prediction</th>
+                    <th>Risk Score</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    {% if session.get('role') == 'admin' %}<td>{{ claim.username }}</td>{% endif %}
+                    <td>{{ claim.claimant_name }}</td>
+                    <td>{{ claim.claim_type }}</td>
+                    <td>${{ "%.2f"|format(claim.claim_amount) }}</td>
+                    <td>
+                        {% if claim.prediction_label == 'Fraud' %}
+                        <span class="badge badge-danger">Fraud</span>
+                        {% else %}
+                        <span class="badge badge-success">Legitimate</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ "%.2f"|format(claim.prediction_score * 100) }}%</td>
+                    <td>{{ claim.created_at }}</td>
+                    <td><a class="nav-link" href="{{ url_for('result', claim_id=claim.id) }}">View</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="muted">No claims available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

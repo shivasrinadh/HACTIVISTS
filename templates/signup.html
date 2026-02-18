@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | ClaimWatch AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="login-shell">
+        <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">
+            <span class="toggle-icon">🌙</span>
+        </button>
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">CW</div>
+                <h1>ClaimWatch AI</h1>
+            </div>
+            <p class="login-subtitle">Create Your Account</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="post" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Enter a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input id="confirm_password" name="confirm_password" type="password"
+                        placeholder="Confirm your password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Account Type</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select account type</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-login" type="submit">Create Account</button>
+            </form>
+            <p class="login-footer">Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
+</body>
+
+</html>
