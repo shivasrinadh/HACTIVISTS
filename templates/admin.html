@@ -31,37 +31,42 @@
 </style>
 
 <div class="admin-header">
-    <h1>⚙️ Admin Panel</h1>
+    <div class="page-hero-icon" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5);"><i class="fas fa-screwdriver-wrench"></i></div>
+    <h1>Admin Panel</h1>
     <p>System management and configuration</p>
 </div>
 
 <section class="card" style="margin-bottom: 2rem;">
     <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-        <span style="font-size:1.75rem;">🔧</span> System Configuration
+        <i class="fas fa-gears" style="color: var(--primary); font-size:1.5rem;"></i> System Configuration
     </h3>
     <p style="margin-bottom: 1.5rem; color: var(--muted); line-height:1.6;">Test and verify email service configuration:</p>
     <form method="GET" action="{{ url_for('test_email_route') }}" style="display: inline;">
-        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #047857, #059669); display:inline-flex; align-items:center; gap:0.5rem;">
-            <span>✓</span> Test Email Service
+        <button type="submit" class="btn btn-primary btn-icon" style="background: linear-gradient(135deg, #047857, #059669);" title="Send test email">
+            <i class="fas fa-paper-plane"></i> Test Email Service
         </button>
     </form>
-    <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;">Sends a test email to your configured email address. Check console logs for details.</p>
+    <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;"><i class="fas fa-info-circle" style="margin-right:0.35rem;"></i>Sends a test email. Check console for details.</p>
 </section>
 
 <section class="grid grid-4" style="margin-bottom: 1rem;">
     <article class="metric">
+        <div class="metric-icon"><i class="fas fa-users"></i></div>
         <h4>Total Users</h4>
         <p>{{ user_count }}</p>
     </article>
     <article class="metric">
+        <div class="metric-icon"><i class="fas fa-file-invoice"></i></div>
         <h4>Total Claims</h4>
         <p>{{ claim_count }}</p>
     </article>
     <article class="metric">
+        <div class="metric-icon danger"><i class="fas fa-triangle-exclamation"></i></div>
         <h4>Fraud Flagged</h4>
         <p>{{ fraud_count }}</p>
     </article>
     <article class="metric">
+        <div class="metric-icon warning"><i class="fas fa-percentage"></i></div>
         <h4>Detection Ratio</h4>
         <p>{{ "%.1f"|format((fraud_count / claim_count * 100) if claim_count else 0) }}%</p>
     </article>
@@ -69,7 +74,7 @@
 
 <section class="card" style="margin-bottom: 2rem;">
     <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
-        <span style="font-size:1.75rem;">👥</span> Team Activity
+        <i class="fas fa-people-group" style="color: var(--primary); font-size:1.5rem;"></i> Team Activity
     </h3>
     <div class="table-wrap">
         <table>
@@ -99,7 +104,7 @@
 
 <section class="card">
     <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
-        <span style="font-size:1.75rem;">🚨</span> High-Risk Claims
+        <i class="fas fa-fire-flame-curved" style="color: var(--danger); font-size:1.5rem;"></i> High-Risk Claims
     </h3>
     <div class="table-wrap">
         <table>

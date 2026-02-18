@@ -31,35 +31,36 @@
 </style>
 
 <div class="page-header">
-    <h1>📤 Upload Insurance Claim</h1>
+    <div class="page-hero-icon"><i class="fas fa-file-upload"></i></div>
+    <h1>Upload Insurance Claim</h1>
     <p>Submit a new claim for fraud detection analysis</p>
 </div>
 
 <section class="card">
     <h3 style="margin-top: 0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
-        <span style="font-size:1.75rem;">📝</span> Claim Information
+        <i class="fas fa-clipboard-list" style="color: var(--primary); font-size:1.5rem;"></i> Claim Information
     </h3>
-    <p class="muted" style="margin-bottom: 1.5rem;">Select claim type to see relevant fields for detailed information.</p>
+    <p class="muted" style="margin-bottom: 1.5rem;"><i class="fas fa-info-circle" style="margin-right:0.35rem;"></i>Select claim type to see relevant fields.</p>
 
     <form id="claim-form" method="post" enctype="multipart/form-data">
         <div class="form-grid">
             <div>
-                <label for="claimant_name">Claimant Name</label>
+                <label for="claimant_name" class="label-with-icon"><i class="fas fa-user"></i> Claimant Name</label>
                 <input data-required="true" id="claimant_name" name="claimant_name" type="text"
                     value="{{ form_data.get('claimant_name', '') }}" required>
             </div>
             <div>
-                <label for="claimant_email">Email Address</label>
+                <label for="claimant_email" class="label-with-icon"><i class="fas fa-envelope"></i> Email Address</label>
                 <input data-required="true" id="claimant_email" name="claimant_email" type="email"
                     placeholder="your@email.com" value="{{ form_data.get('claimant_email', '') }}" required>
             </div>
             <div>
-                <label for="claimant_age">Age</label>
+                <label for="claimant_age" class="label-with-icon"><i class="fas fa-birthday-cake"></i> Age</label>
                 <input data-required="true" id="claimant_age" name="claimant_age" type="number" min="18" max="120"
                     value="{{ form_data.get('claimant_age', '') }}" required>
             </div>
             <div>
-                <label for="claimant_gender">Gender</label>
+                <label for="claimant_gender" class="label-with-icon"><i class="fas fa-venus-mars"></i> Gender</label>
                 <select data-required="true" id="claimant_gender" name="claimant_gender" required>
                     {% set selected_gender = form_data.get('claimant_gender', '') %}
                     <option value="">Select gender</option>
@@ -69,7 +70,7 @@
                 </select>
             </div>
             <div>
-                <label for="claim_type">Claim Type</label>
+                <label for="claim_type" class="label-with-icon"><i class="fas fa-tag"></i> Claim Type</label>
                 <select data-required="true" id="claim_type" name="claim_type" required>
                     {% set selected_type = form_data.get('claim_type', '') %}
                     <option value="">Select type</option>
@@ -81,33 +82,33 @@
                 </select>
             </div>
             <div>
-                <label for="incident_date">Incident Date</label>
+                <label for="incident_date" class="label-with-icon"><i class="fas fa-calendar-day"></i> Incident Date</label>
                 <input data-required="true" id="incident_date" name="incident_date" type="date"
                     value="{{ form_data.get('incident_date', '') }}" required>
             </div>
             <div>
-                <label for="claim_amount">Claim Amount (USD)</label>
+                <label for="claim_amount" class="label-with-icon"><i class="fas fa-dollar-sign"></i> Claim Amount (USD)</label>
                 <input data-required="true" id="claim_amount" name="claim_amount" type="number" min="1" step="0.01"
                     value="{{ form_data.get('claim_amount', '') }}" required>
             </div>
             <div>
-                <label for="age_of_policy_days">Policy Age (Days)</label>
+                <label for="age_of_policy_days" class="label-with-icon"><i class="fas fa-calendar-check"></i> Policy Age (Days)</label>
                 <input data-required="true" id="age_of_policy_days" name="age_of_policy_days" type="number" min="0"
                     step="1" value="{{ form_data.get('age_of_policy_days', '') }}" required>
             </div>
             <div>
-                <label for="number_of_previous_claims">Previous Claims</label>
+                <label for="number_of_previous_claims" class="label-with-icon"><i class="fas fa-history"></i> Previous Claims</label>
                 <input data-required="true" id="number_of_previous_claims" name="number_of_previous_claims"
                     type="number" min="0" step="1" value="{{ form_data.get('number_of_previous_claims', '') }}"
                     required>
             </div>
             <div>
-                <label for="location_risk_score">Location Risk Score (0 - 1)</label>
+                <label for="location_risk_score" class="label-with-icon"><i class="fas fa-map-marker-alt"></i> Location Risk Score (0 - 1)</label>
                 <input data-required="true" id="location_risk_score" name="location_risk_score" type="number" min="0"
                     max="1" step="0.01" value="{{ form_data.get('location_risk_score', '') }}" required>
             </div>
             <div>
-                <label for="police_report_filed">Police Report Filed</label>
+                <label for="police_report_filed" class="label-with-icon"><i class="fas fa-file-signature"></i> Police Report Filed</label>
                 {% set police = form_data.get('police_report_filed', '0') %}
                 <select data-required="true" id="police_report_filed" name="police_report_filed" required>
                     <option value="1" {% if police=='1' %}selected{% endif %}>Yes</option>
@@ -115,12 +116,12 @@
                 </select>
             </div>
             <div id="police-report-number-field" style="display: none;">
-                <label for="police_report_number">Police Report Number</label>
+                <label for="police_report_number" class="label-with-icon"><i class="fas fa-hashtag"></i> Police Report Number</label>
                 <input id="police_report_number" name="police_report_number" type="text"
                     placeholder="e.g., POL-2025-12345" value="{{ form_data.get('police_report_number', '') }}">
             </div>
             <div>
-                <label for="witnesses">Witnesses</label>
+                <label for="witnesses" class="label-with-icon"><i class="fas fa-users"></i> Witnesses</label>
                 <input data-required="true" id="witnesses" name="witnesses" type="number" min="0" step="1"
                     value="{{ form_data.get('witnesses', '') }}" required>
             </div>
@@ -131,13 +132,13 @@
         </div>
 
         <div>
-            <label for="description">Incident Description</label>
+            <label for="description" class="label-with-icon"><i class="fas fa-align-left"></i> Incident Description</label>
             <textarea id="description" name="description"
                 placeholder="Provide brief context">{{ form_data.get('description', '') }}</textarea>
         </div>
 
         <div>
-            <label for="claim_image">Claim Evidence (Image)</label>
+            <label for="claim_image" class="label-with-icon"><i class="fas fa-image"></i> Claim Evidence (Image)</label>
             <div class="file-upload-wrapper">
                 <input data-required="false" id="claim_image" name="claim_image" type="file" accept="image/*" />
                 <p class="file-help">Supported formats: JPG, PNG, GIF (Max 5MB)</p>
@@ -150,11 +151,11 @@
         </div>
 
         <div class="actions" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border);">
-            <button class="btn btn-primary" type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
-                <span>🔍</span> Predict Fraud Risk
+            <button class="btn btn-primary btn-icon" type="submit" title="Analyze claim for fraud risk">
+                <i class="fas fa-magnifying-glass-chart"></i> Predict Fraud Risk
             </button>
-            <a class="btn btn-secondary" href="{{ url_for('dashboard') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
-                <span>↩️</span> Cancel
+            <a class="btn btn-secondary btn-icon" href="{{ url_for('dashboard') }}" title="Return to dashboard">
+                <i class="fas fa-arrow-left"></i> Cancel
             </a>
         </div>
     </form>

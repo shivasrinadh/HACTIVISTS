@@ -25,26 +25,27 @@
 </style>
 
 <div class="page-header">
-    <h1>📋 Claims History</h1>
+    <div class="page-hero-icon"><i class="fas fa-history"></i></div>
+    <h1>Claims History</h1>
     <p>View all your submitted claims and their status</p>
 </div>
 
 <section class="card">
     <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
-        <span style="font-size:1.75rem;">📊</span> All Claims
+        <i class="fas fa-list" style="color: var(--primary); font-size:1.5rem;"></i> All Claims
     </h3>
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    {% if session.get('role') == 'admin' %}<th>User</th>{% endif %}
-                    <th>Claimant</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Prediction</th>
-                    <th>Risk Score</th>
-                    <th>Date</th>
-                    <th>Action</th>
+                    {% if session.get('role') == 'admin' %}<th><i class="fas fa-user"></i> User</th>{% endif %}
+                    <th><i class="fas fa-user-tag"></i> Claimant</th>
+                    <th><i class="fas fa-tag"></i> Type</th>
+                    <th><i class="fas fa-dollar-sign"></i> Amount</th>
+                    <th><i class="fas fa-shield-halved"></i> Prediction</th>
+                    <th><i class="fas fa-gauge-high"></i> Risk Score</th>
+                    <th><i class="fas fa-calendar"></i> Date</th>
+                    <th><i class="fas fa-eye"></i> Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,11 +64,11 @@
                     </td>
                     <td>{{ "%.2f"|format(claim.prediction_score * 100) }}%</td>
                     <td>{{ claim.created_at }}</td>
-                    <td><a class="btn btn-primary" href="{{ url_for('result', claim_id=claim.id) }}" style="padding:0.5rem 1rem; font-size:0.85rem;">View Details</a></td>
+                    <td><a class="btn btn-primary btn-icon" href="{{ url_for('result', claim_id=claim.id) }}" title="View details"><i class="fas fa-eye"></i> View</a></td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" class="muted">No claims available.</td>
+                    <td colspan="8" class="muted" style="text-align:center; padding:2rem;"><i class="fas fa-inbox" style="font-size:2rem; opacity:0.5; display:block; margin-bottom:0.5rem;"></i> No claims available.</td>
                 </tr>
                 {% endfor %}
             </tbody>

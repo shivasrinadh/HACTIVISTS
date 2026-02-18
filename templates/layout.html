@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ClaimWatch AI{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -13,19 +14,19 @@
         {% if session.get('user_id') %}
         <header class="topbar">
             <div class="topbar-inner">
-                <a href="{{ url_for('index') }}" class="brand" style="transition: all 0.3s ease;">
-                    <span class="brand-badge">CW</span>
+                <a href="{{ url_for('index') }}" class="brand" style="transition: all 0.3s ease;" title="Home">
+                    <span class="brand-badge"><i class="fas fa-shield-halved"></i></span>
                     <span style="font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px;">ClaimWatch AI</span>
                 </a>
-                <nav class="nav-links">
-                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-                    <a class="nav-link" href="{{ url_for('upload_claim') }}">Upload Claim</a>
-                    <a class="nav-link" href="{{ url_for('claims_history') }}">Claims History</a>
-                    <a class="nav-link" href="{{ url_for('analytics') }}">Analytics</a>
+                <nav class="nav-links nav-icons">
+                    <a class="nav-link nav-icon-link" href="{{ url_for('dashboard') }}" title="Dashboard"><i class="fas fa-th-large"></i><span class="nav-icon-label">Dashboard</span></a>
+                    <a class="nav-link nav-icon-link" href="{{ url_for('upload_claim') }}" title="Submit new claim"><i class="fas fa-file-upload"></i><span class="nav-icon-label">New Claim</span></a>
+                    <a class="nav-link nav-icon-link" href="{{ url_for('claims_history') }}" title="View all claims"><i class="fas fa-history"></i><span class="nav-icon-label">History</span></a>
+                    <a class="nav-link nav-icon-link" href="{{ url_for('analytics') }}" title="Analytics & reports"><i class="fas fa-chart-line"></i><span class="nav-icon-label">Analytics</span></a>
                     {% if session.get('role') == 'admin' %}
-                    <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                    <a class="nav-link nav-icon-link" href="{{ url_for('admin') }}" title="Admin panel"><i class="fas fa-cog"></i><span class="nav-icon-label">Admin</span></a>
                     {% endif %}
-                    <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+                    <a class="nav-link nav-icon-link nav-link-logout" href="{{ url_for('logout') }}" title="Log out"><i class="fas fa-right-from-bracket"></i><span class="nav-icon-label">Logout</span><span class="nav-username">{{ session.get('username') }}</span></a>
                 </nav>
             </div>
         </header>
@@ -47,7 +48,7 @@
             style="border-top: 2px solid var(--border); padding: 3rem 2rem; text-align: center; color: var(--muted); font-size: 0.95rem; margin-top: 4rem; background: linear-gradient(135deg, var(--surface-alt), var(--surface)); border-radius: 20px 20px 0 0; animation: fadeInUp 0.8s ease-out;">
             <div style="max-width: 600px; margin: 0 auto;">
                 <p style="margin: 0.75rem 0; font-size: 1.1rem;">
-                    <span style="font-size: 1.3rem; margin-right: 0.5rem;">📧</span>
+                    <i class="fas fa-envelope" style="font-size: 1.2rem; margin-right: 0.5rem; color: var(--primary);"></i>
                     <strong style="color: var(--text);">Support:</strong> 
                     <a href="mailto:insuranceclaimwatchai@gmail.com"
                         style="color: var(--primary); text-decoration: none; font-weight: 600; transition: all 0.3s ease;"

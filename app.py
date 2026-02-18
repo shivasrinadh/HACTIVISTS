@@ -5,13 +5,14 @@ import os
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
-from flask import Flask, g, redirect, render_template, request, session, url_for, flash
+from flask import Flask, g, redirect, render_template, request, session, url_for, flash, send_file, Response
 
 from config import Config
 from database.db_setup import init_db
 from model.predict import ensure_model_exists, predict_claim
 from utils.helpers import hash_password, verify_password, send_claim_notification, test_email_configuration
 from utils.preprocessing import prepare_features_from_form
+from utils.pdf_generator import generate_investigation_report
 
 
 app = Flask(__name__)
@@ -529,46 +530,62 @@ def analytics():
         """
     ).fetchall()
     
-    # Gender analysis
-    gender_analysis = db.execute(
+    # Region risk analysis (location risk zones x claim types)
+    region_risk_data = db.execute(
         """
         SELECT 
-            claimant_gender,
+            claim_type,
+            CASE 
+                WHEN location_risk_score < 0.3 THEN 'Low Risk Zone'
+                WHEN location_risk_score < 0.6 THEN 'Medium Risk Zone'
+                WHEN location_risk_score < 0.8 THEN 'High Risk Zone'
+                ELSE 'Critical Risk Zone'
+            END AS risk_zone,
             COUNT(*) AS total_claims,
             SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
-            AVG(prediction_score) AS avg_risk_score,
-            AVG(claim_amount) AS avg_amount
+            AVG(prediction_score) AS avg_risk_score
         FROM claims
-        WHERE claimant_gender IS NOT NULL AND claimant_gender != ''
-        GROUP BY claimant_gender
+        GROUP BY claim_type, risk_zone
+        ORDER BY claim_type, 
+            CASE risk_zone
+                WHEN 'Low Risk Zone' THEN 1
+                WHEN 'Medium Risk Zone' THEN 2
+                WHEN 'High Risk Zone' THEN 3
+                WHEN 'Critical Risk Zone' THEN 4
+            END
         """
     ).fetchall()
     
-    # Claim amount distribution
-    amount_distribution = db.execute(
+    # Customer clustering data (for bubble chart)
+    customer_clusters = db.execute(
         """
         SELECT 
-            CASE 
-                WHEN claim_amount < 1000 THEN 'Under $1K'
-                WHEN claim_amount < 5000 THEN '$1K-$5K'
-                WHEN claim_amount < 10000 THEN '$5K-$10K'
-                WHEN claim_amount < 25000 THEN '$10K-$25K'
-                WHEN claim_amount < 50000 THEN '$25K-$50K'
-                ELSE 'Over $50K'
-            END AS amount_range,
-            COUNT(*) AS count,
-            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count
+            claimant_age,
+            claim_amount,
+            prediction_score,
+            prediction_label,
+            number_of_previous_claims,
+            claim_type,
+            claimant_name
         FROM claims
-        GROUP BY amount_range
-        ORDER BY 
-            CASE amount_range
-                WHEN 'Under $1K' THEN 1
-                WHEN '$1K-$5K' THEN 2
-                WHEN '$5K-$10K' THEN 3
-                WHEN '$10K-$25K' THEN 4
-                WHEN '$25K-$50K' THEN 5
-                WHEN 'Over $50K' THEN 6
-            END
+        WHERE claimant_age IS NOT NULL
+        ORDER BY prediction_score DESC
+        LIMIT 200
+        """
+    ).fetchall()
+    
+    # Monthly fraud heatmap data
+    monthly_fraud_heatmap = db.execute(
+        """
+        SELECT 
+            strftime('%Y-%m', created_at) AS month,
+            claim_type,
+            COUNT(*) AS total_claims,
+            SUM(CASE WHEN prediction_label = 'Fraud' THEN 1 ELSE 0 END) AS fraud_count,
+            AVG(prediction_score) AS avg_risk_score
+        FROM claims
+        GROUP BY month, claim_type
+        ORDER BY month ASC, claim_type
         """
     ).fetchall()
     
@@ -687,8 +704,9 @@ def analytics():
         risk_distribution=risk_distribution,
         age_analysis=age_analysis,
         policy_age_analysis=policy_age_analysis,
-        gender_analysis=gender_analysis,
-        amount_distribution=amount_distribution,
+        region_risk_data=region_risk_data,
+        customer_clusters=customer_clusters,
+        monthly_fraud_heatmap=monthly_fraud_heatmap,
         risk_score_distribution=risk_score_distribution,
         risk_correlation_data=risk_correlation_data,
         hourly_pattern=hourly_pattern,
@@ -722,12 +740,55 @@ def uploaded_file(filename):
         flash("Image not found.", "warning")
         return redirect(url_for("dashboard"))
     
-    from flask import send_file
     try:
         return send_file(file_path)
     except Exception:
         flash("Error retrieving image.", "danger")
         return redirect(url_for("dashboard"))
+
+
+@app.route("/generate_report/<int:claim_id>")
+@login_required
+def generate_report(claim_id):
+    """
+    Generate and download AI Investigation Report PDF
+    Premium feature - one-click comprehensive fraud analysis report
+    """
+    db = get_db()
+    query = "SELECT * FROM claims WHERE id = ?"
+    params = [claim_id]
+    
+    # Security: users can only generate reports for their own claims (unless admin)
+    if session.get("role") != "admin":
+        query += " AND user_id = ?"
+        params.append(session["user_id"])
+    
+    claim = db.execute(query, tuple(params)).fetchone()
+    
+    if not claim:
+        flash("Claim not found.", "warning")
+        return redirect(url_for("claims_history"))
+    
+    try:
+        # Generate PDF report
+        pdf_buffer = generate_investigation_report(claim, app.config)
+        
+        # Create filename with claim ID and timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"Investigation_Report_CW-{claim_id:06d}_{timestamp}.pdf"
+        
+        # Return PDF as download
+        return Response(
+            pdf_buffer,
+            mimetype='application/pdf',
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}',
+                'Content-Type': 'application/pdf'
+            }
+        )
+    except Exception as e:
+        flash(f"Error generating report: {str(e)}", "danger")
+        return redirect(url_for("result", claim_id=claim_id))
 
 
 bootstrap()

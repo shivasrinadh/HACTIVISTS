@@ -31,25 +31,30 @@
 </style>
 
 <div class="dashboard-header">
-    <h1>📊 Dashboard Overview</h1>
+    <div class="page-hero-icon"><i class="fas fa-th-large"></i></div>
+    <h1>Dashboard Overview</h1>
     <p>Welcome back, {{ session.get('username') }}! Here's your claims summary.</p>
 </div>
 
 <section class="grid grid-4" style="margin-bottom: 2rem;">
     <article class="metric">
-        <h4>📋 Total Claims</h4>
+        <div class="metric-icon"><i class="fas fa-file-invoice"></i></div>
+        <h4>Total Claims</h4>
         <p>{{ total_claims }}</p>
     </article>
     <article class="metric">
-        <h4>⚠️ Flagged Claims</h4>
+        <div class="metric-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+        <h4>Flagged Claims</h4>
         <p>{{ flagged_claims }}</p>
     </article>
     <article class="metric">
-        <h4>✅ Safe Claims</h4>
+        <div class="metric-icon success"><i class="fas fa-check-circle"></i></div>
+        <h4>Safe Claims</h4>
         <p>{{ safe_claims }}</p>
     </article>
     <article class="metric">
-        <h4>📈 Fraud Rate</h4>
+        <div class="metric-icon warning"><i class="fas fa-percentage"></i></div>
+        <h4>Fraud Rate</h4>
         <p>{{ "%.1f"|format(fraud_rate) }}%</p>
     </article>
 </section>
@@ -57,10 +62,10 @@
 <section class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
         <h3 style="margin:0; font-size:1.5rem; font-weight:700; display:flex; align-items:center; gap:0.75rem;">
-            <span style="font-size:1.75rem;">📝</span> Recent Claims
+            <i class="fas fa-list-ul" style="color: var(--primary); font-size:1.5rem;"></i> Recent Claims
         </h3>
-        <a class="btn btn-primary" href="{{ url_for('upload_claim') }}" style="display:inline-flex; align-items:center; gap:0.5rem;">
-            <span>+</span> New Claim
+        <a class="btn btn-primary btn-icon" href="{{ url_for('upload_claim') }}" title="Submit new claim">
+            <i class="fas fa-plus"></i> New Claim
         </a>
     </div>
 
@@ -68,12 +73,12 @@
         <table>
             <thead>
                 <tr>
-                    {% if session.get('role') == 'admin' %}<th>User</th>{% endif %}
-                    <th>Claimant</th>
-                    <th>Amount</th>
-                    <th>Prediction</th>
-                    <th>Risk Score</th>
-                    <th>Created</th>
+                    {% if session.get('role') == 'admin' %}<th><i class="fas fa-user"></i> User</th>{% endif %}
+                    <th><i class="fas fa-user-tag"></i> Claimant</th>
+                    <th><i class="fas fa-dollar-sign"></i> Amount</th>
+                    <th><i class="fas fa-shield-halved"></i> Prediction</th>
+                    <th><i class="fas fa-gauge-high"></i> Risk Score</th>
+                    <th><i class="fas fa-calendar"></i> Created</th>
                 </tr>
             </thead>
             <tbody>
@@ -105,16 +110,16 @@
 <section class="card" style="margin-top: 2rem; background: linear-gradient(135deg, var(--primary-soft), rgba(29, 78, 216, 0.05)); border-left: 4px solid var(--primary); position: relative; overflow: hidden;">
     <div style="position: relative; z-index: 1;">
         <h3 style="margin-top: 0; color: var(--primary); font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 1.75rem;">📧</span> Need Help?
+            <i class="fas fa-envelope-circle-check" style="font-size: 1.75rem;"></i> Need Help?
         </h3>
         <p style="color: var(--text); margin: 0.75rem 0;">For support, questions, or assistance with your claims:</p>
         <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.25rem; flex-wrap: wrap;">
-            <a href="mailto:insuranceclaimwatchai@gmail.com" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                <span>📧</span> Email Support
+            <a href="mailto:insuranceclaimwatchai@gmail.com" class="btn btn-primary btn-icon" title="Email support">
+                <i class="fas fa-paper-plane"></i> Email Support
             </a>
-            <span style="color: var(--muted); font-weight: 600;">insuranceclaimwatchai@gmail.com</span>
+            <span style="color: var(--muted); font-weight: 600;"><i class="fas fa-at" style="margin-right:0.35rem;"></i>insuranceclaimwatchai@gmail.com</span>
         </div>
-        <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;">⏱️ We typically respond within 24 hours</p>
+        <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;"><i class="fas fa-clock" style="margin-right:0.35rem;"></i>We typically respond within 24 hours</p>
     </div>
 </section>
 {% endblock %}

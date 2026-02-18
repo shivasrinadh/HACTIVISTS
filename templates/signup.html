@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | ClaimWatch AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -15,7 +16,7 @@
         </button>
         <div class="login-box">
             <div class="login-header" style="animation: fadeInUp 0.6s ease-out;">
-                <div class="login-logo" style="animation: pulse 3s ease-in-out infinite;">CW</div>
+                <div class="login-logo" style="animation: pulse 3s ease-in-out infinite;"><i class="fas fa-shield-halved"></i></div>
                 <h1 style="animation: fadeInUp 0.8s ease-out 0.2s both;">ClaimWatch AI</h1>
             </div>
             <p class="login-subtitle" style="animation: fadeInUp 1s ease-out 0.4s both;">Create Your Account</p>
@@ -30,27 +31,27 @@
 
             <form method="post" class="login-form">
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username" class="label-with-icon"><i class="fas fa-user"></i> Username</label>
                     <input id="username" name="username" type="text" placeholder="Choose a username" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password" class="label-with-icon"><i class="fas fa-lock"></i> Password</label>
                     <input id="password" name="password" type="password" placeholder="Enter a password" required>
                 </div>
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
+                    <label for="confirm_password" class="label-with-icon"><i class="fas fa-lock"></i> Confirm Password</label>
                     <input id="confirm_password" name="confirm_password" type="password"
                         placeholder="Confirm your password" required>
                 </div>
                 <div class="form-group">
-                    <label for="role">Account Type</label>
+                    <label for="role" class="label-with-icon"><i class="fas fa-user-tag"></i> Account Type</label>
                     <select id="role" name="role" required>
                         <option value="">Select account type</option>
                         <option value="analyst">Analyst</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
-                <button class="btn btn-primary btn-login" type="submit">Create Account</button>
+                <button class="btn btn-primary btn-login btn-icon" type="submit" title="Create account"><i class="fas fa-user-plus"></i> Create Account</button>
             </form>
             <p class="login-footer">Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
         </div>

@@ -10,72 +10,72 @@
         style="background: var(--surface); padding: 3rem; border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.4); max-width: 550px; width: 90%; text-align: center; animation: fadeInUp 0.5s ease-out; position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: {% if claim.prediction_label == 'Fraud' %}linear-gradient(90deg, #dc2626, #ef4444){% else %}linear-gradient(90deg, #10b981, #059669){% endif %};"></div>
         {% if claim.prediction_label == 'Fraud' %}
-        <div style="font-size: 80px; margin-bottom: 1.5rem; animation: pulse 2s ease-in-out infinite;">⚠️</div>
+        <div style="font-size: 80px; margin-bottom: 1.5rem; animation: pulse 2s ease-in-out infinite; color: #dc2626;"><i class="fas fa-circle-xmark"></i></div>
         <h2 style="color: #dc2626; margin: 0 0 1rem 0; font-size: 2rem; font-weight: 800;">Claim Rejected</h2>
         <p style="color: var(--muted); margin: 0 0 2rem 0; font-size: 1.1rem; line-height: 1.6;">Your claim has been flagged for further review due to fraud risk indicators.</p>
         {% else %}
-        <div style="font-size: 80px; margin-bottom: 1.5rem; animation: pulse 2s ease-in-out infinite;">✅</div>
+        <div style="font-size: 80px; margin-bottom: 1.5rem; animation: pulse 2s ease-in-out infinite; color: #10b981;"><i class="fas fa-circle-check"></i></div>
         <h2 style="color: #10b981; margin: 0 0 1rem 0; font-size: 2rem; font-weight: 800;">Claim Approved</h2>
         <p style="color: var(--muted); margin: 0 0 2rem 0; font-size: 1.1rem; line-height: 1.6;">Your claim has been approved for processing.</p>
         {% endif %}
 
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; border: 1px solid var(--border);">
-            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><strong>Type:</strong> {{ claim.claim_type }}</p>
-            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><strong>Amount:</strong> ${{ "%.2f"|format(claim.claim_amount) }}</p>
-            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><strong>Risk Score:</strong> {{ "%.2f"|format(claim.prediction_score * 100) }}%</p>
+            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><i class="fas fa-tag" style="margin-right:0.5rem; color: var(--primary);"></i><strong>Type:</strong> {{ claim.claim_type }}</p>
+            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><i class="fas fa-dollar-sign" style="margin-right:0.5rem; color: var(--primary);"></i><strong>Amount:</strong> ${{ "%.2f"|format(claim.claim_amount) }}</p>
+            <p style="margin: 0.75rem 0; color: var(--text); font-size: 1rem;"><i class="fas fa-gauge-high" style="margin-right:0.5rem; color: var(--primary);"></i><strong>Risk Score:</strong> {{ "%.2f"|format(claim.prediction_score * 100) }}%</p>
         </div>
 
         {% if claim.email_sent == 1 %}
         <div
             style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #10b981;">
-            <strong>✓ Notification email sent to {{ claim.claimant_email }}</strong>
+            <strong><i class="fas fa-envelope-circle-check" style="margin-right:0.5rem;"></i>Notification email sent to {{ claim.claimant_email }}</strong>
         </div>
         {% else %}
         <div
             style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); color: var(--muted); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid var(--muted);">
-            <strong>📧 Email notification not sent (service not configured)</strong>
+            <strong><i class="fas fa-envelope" style="margin-right:0.5rem;"></i>Email notification not sent (service not configured)</strong>
         </div>
         {% endif %}
 
-        <button onclick="closeModal()" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; min-width: 180px;">
-            Continue
+        <button onclick="closeModal()" class="btn btn-primary btn-icon" style="padding: 1rem 2.5rem; font-size: 1.1rem; min-width: 180px;" title="Continue">
+            <i class="fas fa-arrow-right"></i> Continue
         </button>
     </div>
 </div>
 
 <section class="card">
     <h3 style="margin-top:0; font-size:1.5rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
-        <span style="font-size:1.75rem;">📊</span> Prediction Result
+        <i class="fas fa-chart-pie" style="color: var(--primary); font-size:1.5rem;"></i> Prediction Result
     </h3>
 
     {% if claim.email_sent == 1 %}
     <div
         style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-left: 4px solid #10b981; padding: 1rem 1.25rem; margin-bottom: 2rem; border-radius: 12px; animation: slideInRight 0.5s ease-out;">
         <p style="margin: 0; color: #065f46; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-            <span>✓</span> Notification email has been sent to {{ claim.claimant_email }}
+            <i class="fas fa-envelope-circle-check"></i> Notification email has been sent to {{ claim.claimant_email }}
         </p>
     </div>
     {% endif %}
 
     <div class="grid form-grid" style="margin-top: 1.5rem; gap: 1.5rem;">
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); transition: all 0.3s ease;">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Claimant</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-user"></i> Claimant</p>
             <strong style="font-size: 1.1rem; color: var(--text);">{{ claim.claimant_name }}</strong>
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Email</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-envelope"></i> Email</p>
             <strong style="font-size: 1.1rem; color: var(--text);">{{ claim.claimant_email }}</strong>
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Claim Type</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-tag"></i> Claim Type</p>
             <strong style="font-size: 1.1rem; color: var(--text);">{{ claim.claim_type }}</strong>
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Claim Amount</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-dollar-sign"></i> Claim Amount</p>
             <strong style="font-size: 1.1rem; color: var(--text);">${{ "%.2f"|format(claim.claim_amount) }}</strong>
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Predicted Label</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-shield-halved"></i> Predicted Label</p>
             {% if claim.prediction_label == 'Fraud' %}
             <span class="badge badge-danger" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Fraud</span>
             {% else %}
@@ -83,11 +83,11 @@
             {% endif %}
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Fraud Probability</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-gauge-high"></i> Fraud Probability</p>
             <strong style="font-size: 1.3rem; background: linear-gradient(135deg, var(--primary), #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ "%.2f"|format(claim.prediction_score * 100) }}%</strong>
         </div>
         <div style="background: linear-gradient(135deg, var(--surface-alt), var(--surface)); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-            <p class="muted" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Submitted At</p>
+            <p class="muted label-with-icon" style="margin: 0 0 0.5rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-calendar"></i> Submitted At</p>
             <strong style="font-size: 1.1rem; color: var(--text);">{{ claim.created_at }}</strong>
         </div>
         {% if claim.police_report_number %}
@@ -101,7 +101,7 @@
     {% if claim.claim_image %}
     <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border);">
         <h4 style="margin: 0 0 1.5rem 0; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 1.5rem;">📷</span> Claim Evidence
+            <i class="fas fa-image" style="color: var(--primary); font-size: 1.5rem;"></i> Claim Evidence
         </h4>
         <img src="{{ url_for('uploaded_file', filename=claim.claim_image) }}" alt="Claim evidence"
             style="max-width: 500px; max-height: 400px; border-radius: 16px; border: 2px solid var(--border); box-shadow: 0 8px 25px rgba(0,0,0,0.1); transition: all 0.3s ease;"
@@ -110,12 +110,42 @@
     </div>
     {% endif %}
 
+    <!-- Premium AI Report Generator Section -->
+    <div class="card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(29, 78, 216, 0.1), rgba(59, 130, 246, 0.05)); border: 2px solid var(--primary); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle, rgba(29, 78, 216, 0.1), transparent); border-radius: 50%; transform: translate(50%, -50%);"></div>
+        <div style="position: relative; z-index: 1;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; box-shadow: 0 8px 20px rgba(29, 78, 216, 0.3); animation: pulse 2s ease-in-out infinite;">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 0.25rem 0; font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-sparkles"></i> AI Investigation Report Generator
+                    </h3>
+                    <p style="margin: 0; color: var(--muted); font-size: 0.95rem;">Generate a comprehensive PDF report with fraud analysis, evidence, risk factors, and AI insights</p>
+                </div>
+            </div>
+            <a href="{{ url_for('generate_report', claim_id=claim.id) }}" 
+               class="btn btn-primary btn-icon" 
+               style="padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), #3b82f6); box-shadow: 0 8px 25px rgba(29, 78, 216, 0.4); display: inline-flex; align-items: center; gap: 0.75rem;"
+               title="Generate comprehensive AI investigation report">
+                <i class="fas fa-magic"></i> Generate Report
+            </a>
+            <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: var(--muted);">
+                <span><i class="fas fa-check-circle" style="color: var(--success); margin-right:0.35rem;"></i>Fraud Score Analysis</span>
+                <span><i class="fas fa-check-circle" style="color: var(--success); margin-right:0.35rem;"></i>Risk Factors Breakdown</span>
+                <span><i class="fas fa-check-circle" style="color: var(--success); margin-right:0.35rem;"></i>Evidence Documentation</span>
+                <span><i class="fas fa-check-circle" style="color: var(--success); margin-right:0.35rem;"></i>AI Insights & Recommendations</span>
+            </div>
+        </div>
+    </div>
+
     <div class="actions" style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <a class="btn btn-primary" href="{{ url_for('upload_claim') }}" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-            <span>+</span> Submit Another Claim
+        <a class="btn btn-primary btn-icon" href="{{ url_for('upload_claim') }}" title="Submit another claim">
+            <i class="fas fa-plus"></i> Submit Another Claim
         </a>
-        <a class="btn btn-secondary" href="{{ url_for('claims_history') }}" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-            <span>📋</span> View History
+        <a class="btn btn-secondary btn-icon" href="{{ url_for('claims_history') }}" title="View claims history">
+            <i class="fas fa-history"></i> View History
         </a>
     </div>
 </section>
