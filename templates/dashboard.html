@@ -3,29 +3,65 @@
 {% block title %}Dashboard | ClaimWatch AI{% endblock %}
 
 {% block content %}
-<section class="grid grid-4" style="margin-bottom: 1rem;">
+<style>
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 50%, #3b82f6 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite, fadeInUp 0.8s ease-out;
+        color: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(29, 78, 216, 0.3);
+    }
+    
+    .dashboard-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .dashboard-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>📊 Dashboard Overview</h1>
+    <p>Welcome back, {{ session.get('username') }}! Here's your claims summary.</p>
+</div>
+
+<section class="grid grid-4" style="margin-bottom: 2rem;">
     <article class="metric">
-        <h4>Total Claims</h4>
+        <h4>📋 Total Claims</h4>
         <p>{{ total_claims }}</p>
     </article>
     <article class="metric">
-        <h4>Flagged Claims</h4>
+        <h4>⚠️ Flagged Claims</h4>
         <p>{{ flagged_claims }}</p>
     </article>
     <article class="metric">
-        <h4>Safe Claims</h4>
+        <h4>✅ Safe Claims</h4>
         <p>{{ safe_claims }}</p>
     </article>
     <article class="metric">
-        <h4>Fraud Rate</h4>
+        <h4>📈 Fraud Rate</h4>
         <p>{{ "%.1f"|format(fraud_rate) }}%</p>
     </article>
 </section>
 
 <section class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:0.8rem;">
-        <h3 style="margin:0;">Recent Claims</h3>
-        <a class="btn btn-secondary" href="{{ url_for('upload_claim') }}">+ New Claim</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
+        <h3 style="margin:0; font-size:1.5rem; font-weight:700; display:flex; align-items:center; gap:0.75rem;">
+            <span style="font-size:1.75rem;">📝</span> Recent Claims
+        </h3>
+        <a class="btn btn-primary" href="{{ url_for('upload_claim') }}" style="display:inline-flex; align-items:center; gap:0.5rem;">
+            <span>+</span> New Claim
+        </a>
     </div>
 
     <div class="table-wrap">
@@ -66,13 +102,19 @@
     </div>
 </section>
 
-<section class="card" style="margin-top: 1.5rem; background-color: var(--card-light); border-left: 4px solid #1d4ed8;">
-    <h3 style="margin-top: 0; color: #1d4ed8;">📧 Need Help?</h3>
-    <p>For support, questions, or assistance with your claims:</p>
-    <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
-        <a href="mailto:insuranceclaimwatchai@gmail.com" class="btn btn-primary">📧 Email Support</a>
-        <span style="color: #666;">insuranceclaimwatchai@gmail.com</span>
+<section class="card" style="margin-top: 2rem; background: linear-gradient(135deg, var(--primary-soft), rgba(29, 78, 216, 0.05)); border-left: 4px solid var(--primary); position: relative; overflow: hidden;">
+    <div style="position: relative; z-index: 1;">
+        <h3 style="margin-top: 0; color: var(--primary); font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.75rem;">📧</span> Need Help?
+        </h3>
+        <p style="color: var(--text); margin: 0.75rem 0;">For support, questions, or assistance with your claims:</p>
+        <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.25rem; flex-wrap: wrap;">
+            <a href="mailto:insuranceclaimwatchai@gmail.com" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <span>📧</span> Email Support
+            </a>
+            <span style="color: var(--muted); font-weight: 600;">insuranceclaimwatchai@gmail.com</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;">⏱️ We typically respond within 24 hours</p>
     </div>
-    <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">We typically respond within 24 hours</p>
 </section>
 {% endblock %}

@@ -3,8 +3,36 @@
 {% block title %}Claims History | ClaimWatch AI{% endblock %}
 
 {% block content %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 50%, #3b82f6 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite, fadeInUp 0.8s ease-out;
+        color: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(29, 78, 216, 0.3);
+    }
+    
+    .page-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+</style>
+
+<div class="page-header">
+    <h1>📋 Claims History</h1>
+    <p>View all your submitted claims and their status</p>
+</div>
+
 <section class="card">
-    <h3 style="margin-top:0;">Claims History</h3>
+    <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
+        <span style="font-size:1.75rem;">📊</span> All Claims
+    </h3>
     <div class="table-wrap">
         <table>
             <thead>
@@ -35,7 +63,7 @@
                     </td>
                     <td>{{ "%.2f"|format(claim.prediction_score * 100) }}%</td>
                     <td>{{ claim.created_at }}</td>
-                    <td><a class="nav-link" href="{{ url_for('result', claim_id=claim.id) }}">View</a></td>
+                    <td><a class="btn btn-primary" href="{{ url_for('result', claim_id=claim.id) }}" style="padding:0.5rem 1rem; font-size:0.85rem;">View Details</a></td>
                 </tr>
                 {% else %}
                 <tr>

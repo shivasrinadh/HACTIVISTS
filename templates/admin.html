@@ -3,16 +3,49 @@
 {% block title %}Admin | ClaimWatch AI{% endblock %}
 
 {% block content %}
-<section class="card" style="margin-bottom: 1rem;">
-    <h3 style="margin-top:0;">System Configuration</h3>
-    <p style="margin-bottom: 1rem; color: #666;">Test and verify email service configuration:</p>
+<style>
+    .admin-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite, fadeInUp 0.8s ease-out;
+        color: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(185, 28, 28, 0.3);
+    }
+    
+    .admin-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .admin-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="admin-header">
+    <h1>⚙️ Admin Panel</h1>
+    <p>System management and configuration</p>
+</div>
+
+<section class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <span style="font-size:1.75rem;">🔧</span> System Configuration
+    </h3>
+    <p style="margin-bottom: 1.5rem; color: var(--muted); line-height:1.6;">Test and verify email service configuration:</p>
     <form method="GET" action="{{ url_for('test_email_route') }}" style="display: inline;">
-        <button type="submit" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">
-            ✓ Test Email Service
+        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #047857, #059669); display:inline-flex; align-items:center; gap:0.5rem;">
+            <span>✓</span> Test Email Service
         </button>
     </form>
-    <p style="font-size: 12px; color: #999; margin-top: 0.5rem;">Sends a test email to your configured email address.
-        Check console logs for details.</p>
+    <p style="font-size: 0.9rem; color: var(--muted); margin-top: 1rem; margin-bottom: 0;">Sends a test email to your configured email address. Check console logs for details.</p>
 </section>
 
 <section class="grid grid-4" style="margin-bottom: 1rem;">
@@ -34,8 +67,10 @@
     </article>
 </section>
 
-<section class="card" style="margin-bottom: 1rem;">
-    <h3 style="margin-top:0;">Team Activity</h3>
+<section class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
+        <span style="font-size:1.75rem;">👥</span> Team Activity
+    </h3>
     <div class="table-wrap">
         <table>
             <thead>
@@ -63,7 +98,9 @@
 </section>
 
 <section class="card">
-    <h3 style="margin-top:0;">High-Risk Claims</h3>
+    <h3 style="margin-top:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
+        <span style="font-size:1.75rem;">🚨</span> High-Risk Claims
+    </h3>
     <div class="table-wrap">
         <table>
             <thead>

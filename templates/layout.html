@@ -13,9 +13,9 @@
         {% if session.get('user_id') %}
         <header class="topbar">
             <div class="topbar-inner">
-                <a href="{{ url_for('index') }}" class="brand">
+                <a href="{{ url_for('index') }}" class="brand" style="transition: all 0.3s ease;">
                     <span class="brand-badge">CW</span>
-                    <span>ClaimWatch AI</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px;">ClaimWatch AI</span>
                 </a>
                 <nav class="nav-links">
                     <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
@@ -44,10 +44,20 @@
         </main>
 
         <footer class="app-footer"
-            style="border-top: 1px solid var(--border-color); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 3rem;">
-            <p style="margin: 0.5rem 0;">📧 <strong>Support:</strong> <a href="mailto:insuranceclaimwatchai@gmail.com"
-                    style="color: #1d4ed8; text-decoration: none;">insuranceclaimwatchai@gmail.com</a></p>
-            <p style="margin: 0.5rem 0;">&copy; 2026 ClaimWatch AI. All rights reserved.</p>
+            style="border-top: 2px solid var(--border); padding: 3rem 2rem; text-align: center; color: var(--muted); font-size: 0.95rem; margin-top: 4rem; background: linear-gradient(135deg, var(--surface-alt), var(--surface)); border-radius: 20px 20px 0 0; animation: fadeInUp 0.8s ease-out;">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <p style="margin: 0.75rem 0; font-size: 1.1rem;">
+                    <span style="font-size: 1.3rem; margin-right: 0.5rem;">📧</span>
+                    <strong style="color: var(--text);">Support:</strong> 
+                    <a href="mailto:insuranceclaimwatchai@gmail.com"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600; transition: all 0.3s ease;"
+                        onmouseover="this.style.color='#3b82f6'; this.style.textDecoration='underline';"
+                        onmouseout="this.style.color='var(--primary)'; this.style.textDecoration='none';">
+                        insuranceclaimwatchai@gmail.com
+                    </a>
+                </p>
+                <p style="margin: 1rem 0 0 0; color: var(--muted);">&copy; 2026 ClaimWatch AI. All rights reserved.</p>
+            </div>
         </footer>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

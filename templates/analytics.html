@@ -15,53 +15,178 @@
 </script>
 
 <style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+    
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
     .analytics-header {
         text-align: center;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        margin-bottom: 3rem;
+        padding: 2.5rem 2rem;
+        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite, fadeInUp 0.8s ease-out;
         color: white;
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(29, 78, 216, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(29, 78, 216, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .analytics-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
     }
     
     .analytics-header h1 {
-        margin: 0 0 0.5rem 0;
-        font-size: 2rem;
+        margin: 0 0 0.75rem 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out 0.2s both;
     }
     
     .analytics-header p {
         margin: 0;
-        opacity: 0.9;
-        font-size: 1rem;
+        opacity: 0.95;
+        font-size: 1.1rem;
+        font-weight: 300;
+        letter-spacing: 0.3px;
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out 0.4s both;
     }
     
     .charts-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        animation: fadeIn 0.6s ease-out;
     }
     
     @media (max-width: 968px) {
         .charts-grid {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
     }
     
     .chart-container {
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 1.5rem;
-        box-shadow: var(--shadow);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out both;
+    }
+    
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-soft), var(--primary));
+        background-size: 200% 100%;
+        opacity: 0;
+        transition: opacity 0.4s ease;
     }
     
     .chart-container:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+        transform: translateY(-8px) scale(1.01);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(29, 78, 216, 0.1);
+        border-color: var(--primary);
     }
+    
+    .chart-container:hover::before {
+        opacity: 1;
+        animation: shimmer 2s linear infinite;
+    }
+    
+    .chart-container:nth-child(1) { animation-delay: 0.1s; }
+    .chart-container:nth-child(2) { animation-delay: 0.2s; }
+    .chart-container:nth-child(3) { animation-delay: 0.3s; }
+    .chart-container:nth-child(4) { animation-delay: 0.4s; }
+    .chart-container:nth-child(5) { animation-delay: 0.5s; }
+    .chart-container:nth-child(6) { animation-delay: 0.6s; }
     
     .chart-container.full-width {
         width: 100%;
@@ -84,118 +209,340 @@
     .chart-header {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
         border-bottom: 2px solid var(--border);
+        position: relative;
+    }
+    
+    .chart-header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        transition: width 0.4s ease;
+    }
+    
+    .chart-container:hover .chart-header::after {
+        width: 100%;
     }
     
     .chart-header i {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         color: var(--primary);
+        background: linear-gradient(135deg, var(--primary), #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: transform 0.3s ease;
+    }
+    
+    .chart-container:hover .chart-header i {
+        transform: scale(1.1) rotate(5deg);
     }
     
     .chart-header h3 {
         margin: 0;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
+        font-weight: 700;
         color: var(--text);
+        letter-spacing: -0.3px;
     }
     
     .chart-explanation {
-        background: var(--surface-alt);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-top: 1rem;
+        background: linear-gradient(135deg, var(--surface-alt) 0%, var(--surface) 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-top: 1.5rem;
         border-left: 4px solid var(--primary);
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: var(--muted);
-        line-height: 1.6;
+        line-height: 1.8;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chart-explanation::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(29, 78, 216, 0.05), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .chart-container:hover .chart-explanation::before {
+        left: 100%;
     }
     
     .chart-explanation strong {
         color: var(--text);
+        font-weight: 700;
+        display: inline-block;
+        margin-right: 0.5rem;
     }
     
     .chart-wrapper {
         position: relative;
         height: 350px;
-        margin: 1rem 0;
+        margin: 1.5rem 0;
         min-height: 350px;
+        border-radius: 12px;
+        background: var(--surface-alt);
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .chart-container:hover .chart-wrapper {
+        background: var(--surface);
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
     }
     
     .gauge-wrapper {
         position: relative;
         height: 300px;
-        margin: 1rem 0;
+        margin: 1.5rem 0;
         min-height: 300px;
+        border-radius: 12px;
+        background: var(--surface-alt);
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .chart-container:hover .gauge-wrapper {
+        background: var(--surface);
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
     }
     
     #hourlyChartContainer {
-        margin-top: 2rem !important;
-        margin-bottom: 1rem !important;
+        margin-top: 2.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Loading animation for charts */
+    @keyframes chartLoad {
+        0% {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    canvas {
+        animation: chartLoad 0.8s ease-out;
+    }
+    
+    /* Professional scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--surface-alt);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, var(--primary), #3b82f6);
+        border-radius: 10px;
+        transition: background 0.3s ease;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #2563eb, #60a5fa);
+    }
+    
+    /* Smooth transitions for all interactive elements */
+    * {
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Professional focus states */
+    .chart-container:focus-within {
+        outline: 2px solid var(--primary);
+        outline-offset: 4px;
+    }
+    
+    /* Add subtle glow effect on hover for stat cards */
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .stat-card:hover::after {
+        width: 300px;
+        height: 300px;
     }
     
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        animation: fadeIn 0.6s ease-out;
     }
     
     .stat-card {
-        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 50%, #3b82f6 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 6s ease infinite, fadeInUp 0.6s ease-out both;
         color: white;
-        padding: 1.5rem;
-        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        border-radius: 18px;
         text-align: center;
-        box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2);
+        box-shadow: 0 10px 30px rgba(29, 78, 216, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        transition: transform 0.6s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 20px 50px rgba(29, 78, 216, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    }
+    
+    .stat-card:hover::before {
+        transform: rotate(45deg);
     }
     
     .stat-card.success {
-        background: linear-gradient(135deg, #047857 0%, #059669 100%);
+        background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+        background-size: 200% 200%;
+        box-shadow: 0 10px 30px rgba(4, 120, 87, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+    
+    .stat-card.success:hover {
+        box-shadow: 0 20px 50px rgba(4, 120, 87, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
     }
     
     .stat-card.danger {
-        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+        background-size: 200% 200%;
+        box-shadow: 0 10px 30px rgba(185, 28, 28, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+    
+    .stat-card.danger:hover {
+        box-shadow: 0 20px 50px rgba(185, 28, 28, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
     }
     
     .stat-card.warning {
-        background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+        background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
+        background-size: 200% 200%;
+        box-shadow: 0 10px 30px rgba(180, 83, 9, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+    
+    .stat-card.warning:hover {
+        box-shadow: 0 20px 50px rgba(180, 83, 9, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
     }
     
     .stat-card h4 {
-        margin: 0 0 0.5rem 0;
-        font-size: 0.9rem;
-        opacity: 0.9;
-        font-weight: 500;
+        margin: 0 0 1rem 0;
+        font-size: 0.95rem;
+        opacity: 0.95;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 1;
     }
     
     .stat-card .value {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.5rem;
+        font-weight: 800;
         margin: 0;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
     }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
     
     .heatmap-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 0.75rem;
-        margin: 1rem 0;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
     }
     
     .heatmap-cell {
         background: var(--surface-alt);
-        padding: 1rem;
-        border-radius: 8px;
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
         text-align: center;
         border: 2px solid var(--border);
-        transition: all 0.2s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out both;
+    }
+    
+    .heatmap-cell::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
     .heatmap-cell:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px) scale(1.05);
         border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
     }
+    
+    .heatmap-cell:hover::before {
+        opacity: 1;
+    }
+    
+    .heatmap-cell:nth-child(1) { animation-delay: 0.1s; }
+    .heatmap-cell:nth-child(2) { animation-delay: 0.2s; }
+    .heatmap-cell:nth-child(3) { animation-delay: 0.3s; }
+    .heatmap-cell:nth-child(4) { animation-delay: 0.4s; }
+    .heatmap-cell:nth-child(5) { animation-delay: 0.5s; }
     
     .heatmap-cell.low { background: #d1fae5; border-color: #10b981; }
     .heatmap-cell.medium { background: #fef3c7; border-color: #f59e0b; }
@@ -207,19 +554,63 @@
     
     .timeline-item {
         display: flex;
-        gap: 1rem;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        background: var(--surface-alt);
-        border-radius: 8px;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--surface-alt) 0%, var(--surface) 100%);
+        border-radius: 12px;
         border-left: 4px solid var(--danger);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideInLeft 0.5s ease-out both;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--danger), #ef4444);
+        transform: scaleY(0);
+        transform-origin: bottom;
+        transition: transform 0.4s ease;
+    }
+    
+    .timeline-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+        border-left-color: #ef4444;
+    }
+    
+    .timeline-item:hover::before {
+        transform: scaleY(1);
     }
     
     .timeline-item .risk-score {
-        font-weight: 700;
+        font-weight: 800;
         color: var(--danger);
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        min-width: 60px;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(185, 28, 28, 0.1));
+        padding: 0.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
     }
+    
+    .timeline-item:hover .risk-score {
+        transform: scale(1.1);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2));
+    }
+    
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
 </style>
 
 <div class="analytics-header">
@@ -228,11 +619,13 @@
 </div>
 
 {% if total_claims == 0 %}
-<div class="card" style="text-align: center; padding: 3rem;">
-    <i class="fas fa-chart-bar" style="font-size: 4rem; color: var(--muted); margin-bottom: 1rem;"></i>
-    <h3 style="color: var(--muted);">No Data Available</h3>
-    <p style="color: var(--muted);">Start submitting claims to see analytics and insights.</p>
-    <a href="{{ url_for('upload_claim') }}" class="btn btn-primary" style="margin-top: 1rem;">Submit Your First Claim</a>
+<div class="card" style="text-align: center; padding: 4rem 3rem; animation: fadeInUp 0.8s ease-out; border-radius: 20px;">
+    <div style="animation: pulse 2s ease-in-out infinite;">
+        <i class="fas fa-chart-bar" style="font-size: 5rem; background: linear-gradient(135deg, var(--primary), #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1.5rem;"></i>
+    </div>
+    <h3 style="color: var(--text); font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem;">No Data Available</h3>
+    <p style="color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6;">Start submitting claims to see comprehensive analytics and insights.</p>
+    <a href="{{ url_for('upload_claim') }}" class="btn btn-primary" style="margin-top: 1rem; padding: 0.875rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(29, 78, 216, 0.3);">Submit Your First Claim</a>
 </div>
 {% else %}
 
@@ -499,24 +892,39 @@
                 borderWidth: 0
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { padding: 15, font: { size: 12 } }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed + ' claims';
-                        }
-                    }
-                }
-            },
-            cutout: '60%'
-        },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            animateRotate: true,
+                            animateScale: true,
+                            duration: 1500,
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    padding: 15, 
+                                    font: { size: 12 },
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.parsed + ' claims';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    },
         plugins: [{
             id: 'centerText',
             beforeDraw: function(chart) {
@@ -582,9 +990,22 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeOutQuart'
+                        },
                         plugins: {
-                            legend: { position: 'top' },
+                            legend: { 
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
+                            },
                             tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
                                 callbacks: {
                                     label: function(context) {
                                         return context.dataset.label + ': Amount $' + context.parsed.x.toLocaleString() + ', Risk: ' + context.parsed.y.toFixed(1) + '%';
@@ -687,17 +1108,22 @@
                 borderWidth: 0
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            rotation: -90,
-            circumference: 180,
-            cutout: '75%',
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false }
-            }
-        },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        rotation: -90,
+                        circumference: 180,
+                        cutout: '75%',
+                        animation: {
+                            animateRotate: true,
+                            duration: 2000,
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
+                    },
         plugins: [{
             id: 'gaugeText',
             beforeDraw: function(chart) {
@@ -1152,10 +1578,34 @@
             console.error('Error initializing charts:', error);
             // Show error message to user
             const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = 'padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px; margin: 1rem;';
-            errorDiv.textContent = 'Error loading charts: ' + error.message;
-            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.container').firstChild);
+            errorDiv.style.cssText = 'padding: 1.5rem; background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; border-radius: 12px; margin: 1.5rem; border-left: 4px solid #dc2626; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2); animation: fadeInUp 0.5s ease-out;';
+            errorDiv.innerHTML = '<strong style="display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">⚠️ Error Loading Charts</strong>' + error.message;
+            const container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(errorDiv, container.firstChild);
+            }
         }
+        
+        // Add intersection observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all chart containers
+        document.querySelectorAll('.chart-container').forEach(container => {
+            observer.observe(container);
+        });
+        
     }); // End of window load event
 </script>
 {% endif %}

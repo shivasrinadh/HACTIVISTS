@@ -3,9 +3,43 @@
 {% block title %}Upload Claim | ClaimWatch AI{% endblock %}
 
 {% block content %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 50%, #3b82f6 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite, fadeInUp 0.8s ease-out;
+        color: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(29, 78, 216, 0.3);
+    }
+    
+    .page-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    
+    .page-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="page-header">
+    <h1>📤 Upload Insurance Claim</h1>
+    <p>Submit a new claim for fraud detection analysis</p>
+</div>
+
 <section class="card">
-    <h3 style="margin-top: 0;">Upload Insurance Claim</h3>
-    <p class="muted">Select claim type to see relevant fields for detailed information.</p>
+    <h3 style="margin-top: 0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:2px solid var(--border);">
+        <span style="font-size:1.75rem;">📝</span> Claim Information
+    </h3>
+    <p class="muted" style="margin-bottom: 1.5rem;">Select claim type to see relevant fields for detailed information.</p>
 
     <form id="claim-form" method="post" enctype="multipart/form-data">
         <div class="form-grid">
@@ -115,9 +149,13 @@
             </div>
         </div>
 
-        <div class="actions">
-            <button class="btn btn-primary" type="submit">Predict Fraud Risk</button>
-            <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+        <div class="actions" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border);">
+            <button class="btn btn-primary" type="submit" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
+                <span>🔍</span> Predict Fraud Risk
+            </button>
+            <a class="btn btn-secondary" href="{{ url_for('dashboard') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700;">
+                <span>↩️</span> Cancel
+            </a>
         </div>
     </form>
 
